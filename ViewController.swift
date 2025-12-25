@@ -1,5 +1,11 @@
 import UIKit
 
+// MARK: - Habit Model
+struct Habit: Codable {
+    let title: String
+    var isCompleted: Bool
+}
+
 class HomeViewController: UIViewController {
 
     private let typingLabel = UILabel()
@@ -18,17 +24,74 @@ class HomeViewController: UIViewController {
         "Позволь себе отдыхать",
         "Настройся на позитив"
     ]
+    // MARK: - Habit Progress Label
+    private let habitsProgress = UILabel() // ← сюда убираем локальную переменную и делаем свойство
+
+    // MARK: Habit Block
+    private var habits: [Habit] = [] {
+        didSet {
+            saveHabits()
+            reloadHabitStack()
+        }
+    }
+    
+    private let lastResetKey = "lastHabitResetDate"
+
+    private let habitsContainerCard = UIView()
+    private let habitStack = UIStackView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        loadHabits()
+        resetHabitsIfNeeded()
+        updateHabitsProgress()
+
+    }
+    
+    private func resetHabitsIfNeeded() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        if let lastReset = UserDefaults.standard.object(forKey: lastResetKey) as? Date {
+            if !calendar.isDate(lastReset, inSameDayAs: today) {
+                // Сбросить все привычки
+                habits = habits.map { Habit(title: $0.title, isCompleted: false) }
+                UserDefaults.standard.set(today, forKey: lastResetKey)
+                saveHabits()
+            }
+        } else {
+            // Первый запуск — просто сохраняем дату
+            UserDefaults.standard.set(today, forKey: lastResetKey)
+        }
     }
 
+
     private func setupUI() {
-        // Светлый фон, ближе к белому
         view.backgroundColor = AppColors.background
 
-        // Логотип SEREVIA
+        // ScrollView для контента
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0), // место для полоски
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+
+        // Логотип
         let logoLabel = UILabel()
         let attributed = NSMutableAttributedString(string: "SEREVIA")
         attributed.addAttribute(.kern, value: 8, range: NSRange(location: 0, length: attributed.length))
@@ -36,7 +99,6 @@ class HomeViewController: UIViewController {
         logoLabel.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         logoLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         logoLabel.textAlignment = .center
-        logoLabel.translatesAutoresizingMaskIntoConstraints = false
 
         // Приветствие
         let greetingLabel = UILabel()
@@ -44,11 +106,10 @@ class HomeViewController: UIViewController {
         greetingLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
         greetingLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         greetingLabel.textAlignment = .center
-        greetingLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Карточка с цитатой
+        // Цитата
         let quoteCard = createCardView()
-        typingLabel.text = (phrases.first!)
+        typingLabel.text = phrases.first
         typingLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         typingLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         typingLabel.textAlignment = .center
@@ -79,10 +140,11 @@ class HomeViewController: UIViewController {
         // Привычки
         let habitsCard = createCardView()
         let habitsTitle = createSmallLabel("Привычки")
-        let habitsProgress = UILabel()
-        habitsProgress.text = "3 / 5"
-        habitsProgress.font = UIFont.systemFont(ofSize: 22, weight: .bold) // побольше
+        habitsProgress.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         habitsProgress.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
+        updateHabitsProgress() // ← сразу обновляем текст при запуске
+
+
         let habitsSubtitle = createSmallLabel("Сегодня")
 
         let habitsStack = UIStackView(arrangedSubviews: [habitsTitle, habitsProgress])
@@ -153,6 +215,9 @@ class HomeViewController: UIViewController {
             actionsStack.bottomAnchor.constraint(equalTo: actionsCard.bottomAnchor, constant: -16)
         ])
 
+        // Новый блок привычек
+        setupHabitBlock()
+
         // Сегодня
         let todayCard = createCardView()
         let todayTitle = createTitleLabel("Сегодня")
@@ -170,20 +235,24 @@ class HomeViewController: UIViewController {
             todayStack.bottomAnchor.constraint(equalTo: todayCard.bottomAnchor, constant: -16)
         ])
 
-        // Общий стек
-        let mainStack = UIStackView(arrangedSubviews: [logoLabel, greetingLabel, quoteCard, habitsAndStreakStack, actionsCard, todayCard])
+        // Основной стек контента
+        let mainStack = UIStackView(arrangedSubviews: [logoLabel, greetingLabel, quoteCard, habitsAndStreakStack, actionsCard, habitsContainerCard, todayCard])
         mainStack.axis = .vertical
         mainStack.alignment = .fill
         mainStack.spacing = 18
         mainStack.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(mainStack)
-
+        contentView.addSubview(mainStack)
+        
         NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
+
+        
+        
+        
     }
 
     // MARK: Components
@@ -204,14 +273,6 @@ class HomeViewController: UIViewController {
         let label = UILabel()
         label.text = text
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-        return label
-    }
-
-    private func createSubtitleLabel(_ text: String) -> UILabel {
-        let label = UILabel()
-        label.text = text
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         return label
     }
@@ -239,6 +300,110 @@ class HomeViewController: UIViewController {
 
     @objc private func nextPhrase() {
         currentPhraseIndex = (currentPhraseIndex + 1) % phrases.count
-        typingLabel.text = "\"\(phrases[currentPhraseIndex])\""
+        typingLabel.text = "\(phrases[currentPhraseIndex])"
+    }
+
+    // MARK: Habit Block
+
+    private func setupHabitBlock() {
+        habitsContainerCard.backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
+        habitsContainerCard.layer.cornerRadius = 20
+        habitsContainerCard.layer.shadowColor = UIColor.black.withAlphaComponent(0.08).cgColor
+        habitsContainerCard.layer.shadowOpacity = 0.3
+        habitsContainerCard.layer.shadowOffset = CGSize(width: 0, height: 2)
+        habitsContainerCard.layer.shadowRadius = 3
+        habitsContainerCard.translatesAutoresizingMaskIntoConstraints = false
+
+        let titleLabel = createTitleLabel("Мои привычки")
+        let addButton = UIButton(type: .system)
+        addButton.setTitle("➕ Добавить привычку", for: .normal)
+        addButton.setTitleColor(.white, for: .normal)
+        addButton.backgroundColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+        addButton.layer.cornerRadius = 14
+        addButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        addButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        addButton.addTarget(self, action: #selector(addHabit), for: .touchUpInside)
+
+        habitStack.axis = .vertical
+        habitStack.spacing = 10
+        habitStack.translatesAutoresizingMaskIntoConstraints = false
+
+        let containerStack = UIStackView(arrangedSubviews: [titleLabel, habitStack, addButton])
+        containerStack.axis = .vertical
+        containerStack.spacing = 10
+        containerStack.translatesAutoresizingMaskIntoConstraints = false
+
+        habitsContainerCard.addSubview(containerStack)
+
+        NSLayoutConstraint.activate([
+            containerStack.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor, constant: 16),
+            containerStack.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor, constant: 16),
+            containerStack.trailingAnchor.constraint(equalTo: habitsContainerCard.trailingAnchor, constant: -16),
+            containerStack.bottomAnchor.constraint(equalTo: habitsContainerCard.bottomAnchor, constant: -16)
+        ])
+    }
+
+    @objc private func addHabit() {
+        let alert = UIAlertController(title: "Новая привычка", message: "Введите название привычки", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "Название привычки"
+        
+        }
+        
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { [weak self] _ in
+            guard let text = alert.textFields?.first?.text, !text.isEmpty else { return }
+            self?.habits.append(Habit(title: text, isCompleted: false))
+            self?.updateHabitsProgress() // ← вот сюда вставляем
+        }))
+        present(alert, animated: true)
+    }
+    
+
+    
+    private func reloadHabitStack() {
+        habitStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        for (index, habit) in habits.enumerated() {
+            let button = UIButton(type: .system)
+            let attributed = NSMutableAttributedString(string: "\(habit.isCompleted ? "✔︎" : "○") \(habit.title)")
+            attributed.addAttribute(.font, value: UIFont.systemFont(ofSize: 24), range: NSRange(location: 0, length: 1))
+            attributed.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSRange(location: 2, length: habit.title.count))
+            button.setAttributedTitle(attributed, for: .normal)
+            button.setTitleColor(.black, for: .normal)
+            button.contentHorizontalAlignment = .left
+            button.tag = index
+            button.addTarget(self, action: #selector(toggleHabit(_:)), for: .touchUpInside)
+            habitStack.addArrangedSubview(button)
+        }
+        updateHabitsProgress() // ← обновляем прогресс после полной перезагрузки
+    }
+
+    private func updateHabitsProgress() {
+        let completed = habits.filter { $0.isCompleted }.count
+        let total = habits.count
+        habitsProgress.text = "\(completed) / \(total)"
+    }
+
+
+    @objc private func toggleHabit(_ sender: UIButton) {
+        let index = sender.tag
+        habits[index].isCompleted.toggle()
+        reloadHabitStack() // ← здесь уже обновится прогресс внутри reloadHabitStack
+    }
+
+
+    // MARK: - Persistence
+
+    private func saveHabits() {
+        if let data = try? JSONEncoder().encode(habits) {
+            UserDefaults.standard.set(data, forKey: "habits")
+        }
+    }
+
+    private func loadHabits() {
+        if let data = UserDefaults.standard.data(forKey: "habits"),
+           let savedHabits = try? JSONDecoder().decode([Habit].self, from: data) {
+            habits = savedHabits
+        }
     }
 }
