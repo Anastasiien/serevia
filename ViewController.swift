@@ -24,8 +24,10 @@ class HomeViewController: UIViewController {
         "Позволь себе отдыхать",
         "Настройся на позитив"
     ]
+    
     // MARK: - Habit Progress Label
-    private let habitsProgress = UILabel() // ← сюда убираем локальную переменную и делаем свойство
+    private let habitsProgress = UILabel()
+    
     // MARK: - Streak UI Labels
     private let streakNumber = UILabel()
     private let topLabel = UILabel()
@@ -37,6 +39,7 @@ class HomeViewController: UIViewController {
             reloadHabitStack()
         }
     }
+    
     // MARK: - Streak Properties
     private let streakKey = "currentStreak"
     private let topStreakKey = "topStreak"
@@ -63,30 +66,23 @@ class HomeViewController: UIViewController {
         
         if let lastDate = lastStreakDate {
             if calendar.isDateInYesterday(lastDate) {
-                // Если заходил вчера — +1 к текущему стрику
                 currentStreak += 1
             } else if !calendar.isDateInToday(lastDate) {
-                // Если пропустил день — сброс стрика
                 currentStreak = 1
             }
-            // если уже заходил сегодня — стрик не меняем
         } else {
-            // Первый запуск
             currentStreak = 1
         }
         
-        // Обновляем топ, если нужно
         if currentStreak > topStreak {
             topStreak = currentStreak
         }
         
         lastStreakDate = today
         
-        // Обновляем UI
         streakNumber.text = "\(currentStreak) 🔥"
         topLabel.text = "Топ: \(topStreak)"
     }
-
 
     private let lastResetKey = "lastHabitResetDate"
 
@@ -100,7 +96,6 @@ class HomeViewController: UIViewController {
         resetHabitsIfNeeded()
         updateStreak()
         updateHabitsProgress()
-
     }
     
     private func resetHabitsIfNeeded() {
@@ -109,17 +104,14 @@ class HomeViewController: UIViewController {
         
         if let lastReset = UserDefaults.standard.object(forKey: lastResetKey) as? Date {
             if !calendar.isDate(lastReset, inSameDayAs: today) {
-                // Сбросить все привычки
                 habits = habits.map { Habit(title: $0.title, isCompleted: false) }
                 UserDefaults.standard.set(today, forKey: lastResetKey)
                 saveHabits()
             }
         } else {
-            // Первый запуск — просто сохраняем дату
             UserDefaults.standard.set(today, forKey: lastResetKey)
         }
     }
-
 
     private func setupUI() {
         view.backgroundColor = AppColors.background
@@ -246,45 +238,33 @@ class HomeViewController: UIViewController {
         habitsAndStreakStack.spacing = 15
         habitsAndStreakStack.translatesAutoresizingMaskIntoConstraints = false
 
-        // MARK: - Быстрые действия
-        let actionsCard = createCardView()
-        let actionsTitle = createTitleLabel("Быстрые действия")
-        let dayButton = createActionButton(title: "Оценить день", color: UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1))
-        let photoButton = createActionButton(title: "📸 Фото дня", color: UIColor(red: 0.78, green: 0.70, blue: 0.60, alpha: 1))
-
-        let actionsStack = UIStackView(arrangedSubviews: [actionsTitle, dayButton, photoButton])
-        actionsStack.axis = .vertical
-        actionsStack.spacing = 10
-        actionsCard.addSubview(actionsStack)
-        actionsStack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            actionsStack.topAnchor.constraint(equalTo: actionsCard.topAnchor, constant: 16),
-            actionsStack.leadingAnchor.constraint(equalTo: actionsCard.leadingAnchor, constant: 16),
-            actionsStack.trailingAnchor.constraint(equalTo: actionsCard.trailingAnchor, constant: -16),
-            actionsStack.bottomAnchor.constraint(equalTo: actionsCard.bottomAnchor, constant: -16)
-        ])
-
         // MARK: - Блок "Мои привычки"
         setupHabitBlock()
 
-        // MARK: - Сегодня
-        let todayCard = createCardView()
-        let todayTitle = createTitleLabel("Сегодня")
-        let todaySubtitle = createSmallLabel("Скоро здесь появится ваш день ✨")
-        let todayStack = UIStackView(arrangedSubviews: [todayTitle, todaySubtitle])
-        todayStack.axis = .vertical
-        todayStack.spacing = 8
-        todayCard.addSubview(todayStack)
-        todayStack.translatesAutoresizingMaskIntoConstraints = false
+        // MARK: - Кнопка "Мой дневник" отдельно
+        let diaryCard = createCardView()
+        diaryCard.translatesAutoresizingMaskIntoConstraints = false
+
+        let diaryButton = UIButton(type: .system)
+        diaryButton.setTitle("Мой дневник", for: .normal)
+        diaryButton.setTitleColor(.white, for: .normal)
+        diaryButton.backgroundColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+        diaryButton.layer.cornerRadius = 14
+        diaryButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        diaryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        diaryButton.addTarget(self, action: #selector(openDiary), for: .touchUpInside)
+        diaryButton.translatesAutoresizingMaskIntoConstraints = false
+
+        diaryCard.addSubview(diaryButton)
         NSLayoutConstraint.activate([
-            todayStack.topAnchor.constraint(equalTo: todayCard.topAnchor, constant: 16),
-            todayStack.leadingAnchor.constraint(equalTo: todayCard.leadingAnchor, constant: 16),
-            todayStack.trailingAnchor.constraint(equalTo: todayCard.trailingAnchor, constant: -16),
-            todayStack.bottomAnchor.constraint(equalTo: todayCard.bottomAnchor, constant: -16)
+            diaryButton.topAnchor.constraint(equalTo: diaryCard.topAnchor, constant: 16),
+            diaryButton.leadingAnchor.constraint(equalTo: diaryCard.leadingAnchor, constant: 16),
+            diaryButton.trailingAnchor.constraint(equalTo: diaryCard.trailingAnchor, constant: -16),
+            diaryButton.bottomAnchor.constraint(equalTo: diaryCard.bottomAnchor, constant: -16)
         ])
 
         // MARK: - Основной стек
-        let mainStack = UIStackView(arrangedSubviews: [logoLabel, greetingLabel, quoteCard, habitsAndStreakStack, actionsCard, habitsContainerCard, todayCard])
+        let mainStack = UIStackView(arrangedSubviews: [logoLabel, greetingLabel, quoteCard, habitsAndStreakStack, habitsContainerCard, diaryCard])
         mainStack.axis = .vertical
         mainStack.alignment = .fill
         mainStack.spacing = 18
@@ -297,7 +277,6 @@ class HomeViewController: UIViewController {
             mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
     }
-
 
     // MARK: Components
 
@@ -359,6 +338,7 @@ class HomeViewController: UIViewController {
         habitsContainerCard.translatesAutoresizingMaskIntoConstraints = false
 
         let titleLabel = createTitleLabel("Мои привычки")
+
         let addButton = UIButton(type: .system)
         addButton.setTitle("➕ Добавить привычку", for: .normal)
         addButton.setTitleColor(.white, for: .normal)
@@ -387,18 +367,23 @@ class HomeViewController: UIViewController {
         ])
     }
 
+    @objc private func openDiary() {
+        let vc = DiaryListViewController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+
     @objc private func addHabit() {
         let alert = UIAlertController(title: "Новая привычка", message: "Введите название привычки", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.placeholder = "Название привычки"
-        
         }
         
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { [weak self] _ in
             guard let text = alert.textFields?.first?.text, !text.isEmpty else { return }
             self?.habits.append(Habit(title: text, isCompleted: false))
-            self?.updateHabitsProgress() // ← вот сюда вставляем
+            self?.updateHabitsProgress()
         }))
         present(alert, animated: true)
     }
@@ -407,40 +392,59 @@ class HomeViewController: UIViewController {
         guard gesture.state == .began, let button = gesture.view as? UIButton else { return }
         let index = button.tag
         
-        let alert = UIAlertController(title: "Удалить привычку?", message: "Вы точно хотите удалить \"\(habits[index].title)\"?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Удалить привычку?", message: "Вы точно хотите удалить \"\(habits[index].title)\"?",         preferredStyle: .alert
+        )
+
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
             self?.habits.remove(at: index)
             self?.updateHabitsProgress()
         }))
-        
+
         present(alert, animated: true)
     }
 
-    
+    // MARK: - Habit List Rendering
+
     private func reloadHabitStack() {
         habitStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
         for (index, habit) in habits.enumerated() {
             let button = UIButton(type: .system)
-            let attributed = NSMutableAttributedString(string: "\(habit.isCompleted ? "✔︎" : "○") \(habit.title)")
-            attributed.addAttribute(.font, value: UIFont.systemFont(ofSize: 24), range: NSRange(location: 0, length: 1))
-            attributed.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSRange(location: 2, length: habit.title.count))
+
+            let attributed = NSMutableAttributedString(
+                string: "\(habit.isCompleted ? "✔︎" : "○") \(habit.title)"
+            )
+
+            attributed.addAttribute(
+                .font,
+                value: UIFont.systemFont(ofSize: 24),
+                range: NSRange(location: 0, length: 1)
+            )
+
+            attributed.addAttribute(
+                .font,
+                value: UIFont.systemFont(ofSize: 16),
+                range: NSRange(location: 2, length: habit.title.count)
+            )
+
             button.setAttributedTitle(attributed, for: .normal)
             button.setTitleColor(.black, for: .normal)
             button.contentHorizontalAlignment = .left
             button.tag = index
             button.addTarget(self, action: #selector(toggleHabit(_:)), for: .touchUpInside)
-            
-            // Добавляем длинное нажатие для удаления
-            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+
+            let longPress = UILongPressGestureRecognizer(
+                target: self,
+                action: #selector(handleLongPress(_:))
+            )
             button.addGestureRecognizer(longPress)
 
             habitStack.addArrangedSubview(button)
         }
-        updateHabitsProgress() // обновляем прогресс после полной перезагрузки
-    }
 
-    
+        updateHabitsProgress()
+    }
 
     private func updateHabitsProgress() {
         let completed = habits.filter { $0.isCompleted }.count
@@ -448,13 +452,11 @@ class HomeViewController: UIViewController {
         habitsProgress.text = "\(completed) / \(total)"
     }
 
-
     @objc private func toggleHabit(_ sender: UIButton) {
         let index = sender.tag
         habits[index].isCompleted.toggle()
-        reloadHabitStack() // ← здесь уже обновится прогресс внутри reloadHabitStack
+        reloadHabitStack()
     }
-
 
     // MARK: - Persistence
 
@@ -471,3 +473,4 @@ class HomeViewController: UIViewController {
         }
     }
 }
+
