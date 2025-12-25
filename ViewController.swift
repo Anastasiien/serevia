@@ -26,6 +26,9 @@ class HomeViewController: UIViewController {
     ]
     // MARK: - Habit Progress Label
     private let habitsProgress = UILabel() // ← сюда убираем локальную переменную и делаем свойство
+    // MARK: - Streak UI Labels
+    private let streakNumber = UILabel()
+    private let topLabel = UILabel()
 
     // MARK: Habit Block
     private var habits: [Habit] = [] {
@@ -34,7 +37,57 @@ class HomeViewController: UIViewController {
             reloadHabitStack()
         }
     }
+    // MARK: - Streak Properties
+    private let streakKey = "currentStreak"
+    private let topStreakKey = "topStreak"
+    private let lastStreakDateKey = "lastStreakDate"
+
+    private var currentStreak: Int {
+        get { UserDefaults.standard.integer(forKey: streakKey) }
+        set { UserDefaults.standard.set(newValue, forKey: streakKey) }
+    }
+
+    private var topStreak: Int {
+        get { UserDefaults.standard.integer(forKey: topStreakKey) }
+        set { UserDefaults.standard.set(newValue, forKey: topStreakKey) }
+    }
+
+    private var lastStreakDate: Date? {
+        get { UserDefaults.standard.object(forKey: lastStreakDateKey) as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: lastStreakDateKey) }
+    }
     
+    private func updateStreak() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        if let lastDate = lastStreakDate {
+            if calendar.isDateInYesterday(lastDate) {
+                // Если заходил вчера — +1 к текущему стрику
+                currentStreak += 1
+            } else if !calendar.isDateInToday(lastDate) {
+                // Если пропустил день — сброс стрика
+                currentStreak = 1
+            }
+            // если уже заходил сегодня — стрик не меняем
+        } else {
+            // Первый запуск
+            currentStreak = 1
+        }
+        
+        // Обновляем топ, если нужно
+        if currentStreak > topStreak {
+            topStreak = currentStreak
+        }
+        
+        lastStreakDate = today
+        
+        // Обновляем UI
+        streakNumber.text = "\(currentStreak) 🔥"
+        topLabel.text = "Топ: \(topStreak)"
+    }
+
+
     private let lastResetKey = "lastHabitResetDate"
 
     private let habitsContainerCard = UIView()
@@ -45,6 +98,7 @@ class HomeViewController: UIViewController {
         setupUI()
         loadHabits()
         resetHabitsIfNeeded()
+        updateStreak()
         updateHabitsProgress()
 
     }
@@ -70,20 +124,27 @@ class HomeViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = AppColors.background
 
-        // ScrollView для контента
+        // MARK: - Настройка стрика
+        streakNumber.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        streakNumber.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
+
+        topLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        topLabel.textColor = UIColor(red: 0.56, green: 0.47, blue: 0.38, alpha: 1)
+
+        // MARK: - ScrollView
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
-        
+
         let contentView = UIView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
-        
+
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0), // место для полоски
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -91,7 +152,7 @@ class HomeViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
 
-        // Логотип
+        // MARK: - Логотип
         let logoLabel = UILabel()
         let attributed = NSMutableAttributedString(string: "SEREVIA")
         attributed.addAttribute(.kern, value: 8, range: NSRange(location: 0, length: attributed.length))
@@ -100,14 +161,14 @@ class HomeViewController: UIViewController {
         logoLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         logoLabel.textAlignment = .center
 
-        // Приветствие
+        // MARK: - Приветствие
         let greetingLabel = UILabel()
         greetingLabel.text = "Привет, Анастасия"
         greetingLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
         greetingLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         greetingLabel.textAlignment = .center
 
-        // Цитата
+        // MARK: - Цитата
         let quoteCard = createCardView()
         typingLabel.text = phrases.first
         typingLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -137,45 +198,34 @@ class HomeViewController: UIViewController {
             quoteStack.bottomAnchor.constraint(equalTo: quoteCard.bottomAnchor, constant: -20)
         ])
 
-        // Привычки
+        // MARK: - Привычки
         let habitsCard = createCardView()
         let habitsTitle = createSmallLabel("Привычки")
         habitsProgress.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         habitsProgress.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-        updateHabitsProgress() // ← сразу обновляем текст при запуске
-
+        updateHabitsProgress()
 
         let habitsSubtitle = createSmallLabel("Сегодня")
 
-        let habitsStack = UIStackView(arrangedSubviews: [habitsTitle, habitsProgress])
-        habitsStack.axis = .vertical
-        habitsStack.distribution = .equalSpacing
-        habitsCard.addSubview(habitsStack)
+        let habitsStackView = UIStackView(arrangedSubviews: [habitsTitle, habitsProgress])
+        habitsStackView.axis = .vertical
+        habitsStackView.distribution = .equalSpacing
+        habitsCard.addSubview(habitsStackView)
         habitsCard.addSubview(habitsSubtitle)
-        habitsStack.translatesAutoresizingMaskIntoConstraints = false
+        habitsStackView.translatesAutoresizingMaskIntoConstraints = false
         habitsSubtitle.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            habitsStack.topAnchor.constraint(equalTo: habitsCard.topAnchor, constant: 16),
-            habitsStack.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
-            habitsStack.trailingAnchor.constraint(equalTo: habitsCard.trailingAnchor, constant: -16),
-
-            habitsSubtitle.topAnchor.constraint(equalTo: habitsStack.bottomAnchor, constant: 8),
+            habitsStackView.topAnchor.constraint(equalTo: habitsCard.topAnchor, constant: 16),
+            habitsStackView.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
+            habitsStackView.trailingAnchor.constraint(equalTo: habitsCard.trailingAnchor, constant: -16),
+            habitsSubtitle.topAnchor.constraint(equalTo: habitsStackView.bottomAnchor, constant: 8),
             habitsSubtitle.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
             habitsSubtitle.bottomAnchor.constraint(equalTo: habitsCard.bottomAnchor, constant: -12)
         ])
 
-        // Дней подряд
+        // MARK: - Стрик
         let streakCard = createCardView()
         let streakTitle = createSmallLabel("Дней подряд")
-        let streakNumber = UILabel()
-        streakNumber.text = "7 🔥"
-        streakNumber.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        streakNumber.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-
-        let topLabel = UILabel()
-        topLabel.text = "Топ: 10"
-        topLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        topLabel.textColor = UIColor(red: 0.56, green: 0.47, blue: 0.38, alpha: 1)
 
         let streakStack = UIStackView(arrangedSubviews: [streakTitle, streakNumber, topLabel])
         streakStack.axis = .vertical
@@ -196,10 +246,9 @@ class HomeViewController: UIViewController {
         habitsAndStreakStack.spacing = 15
         habitsAndStreakStack.translatesAutoresizingMaskIntoConstraints = false
 
-        // Быстрые действия
+        // MARK: - Быстрые действия
         let actionsCard = createCardView()
         let actionsTitle = createTitleLabel("Быстрые действия")
-
         let dayButton = createActionButton(title: "Оценить день", color: UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1))
         let photoButton = createActionButton(title: "📸 Фото дня", color: UIColor(red: 0.78, green: 0.70, blue: 0.60, alpha: 1))
 
@@ -215,14 +264,13 @@ class HomeViewController: UIViewController {
             actionsStack.bottomAnchor.constraint(equalTo: actionsCard.bottomAnchor, constant: -16)
         ])
 
-        // Новый блок привычек
+        // MARK: - Блок "Мои привычки"
         setupHabitBlock()
 
-        // Сегодня
+        // MARK: - Сегодня
         let todayCard = createCardView()
         let todayTitle = createTitleLabel("Сегодня")
         let todaySubtitle = createSmallLabel("Скоро здесь появится ваш день ✨")
-
         let todayStack = UIStackView(arrangedSubviews: [todayTitle, todaySubtitle])
         todayStack.axis = .vertical
         todayStack.spacing = 8
@@ -235,25 +283,21 @@ class HomeViewController: UIViewController {
             todayStack.bottomAnchor.constraint(equalTo: todayCard.bottomAnchor, constant: -16)
         ])
 
-        // Основной стек контента
+        // MARK: - Основной стек
         let mainStack = UIStackView(arrangedSubviews: [logoLabel, greetingLabel, quoteCard, habitsAndStreakStack, actionsCard, habitsContainerCard, todayCard])
         mainStack.axis = .vertical
         mainStack.alignment = .fill
         mainStack.spacing = 18
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(mainStack)
-        
         NSLayoutConstraint.activate([
             mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
-
-        
-        
-        
     }
+
 
     // MARK: Components
 
@@ -359,6 +403,19 @@ class HomeViewController: UIViewController {
         present(alert, animated: true)
     }
     
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began, let button = gesture.view as? UIButton else { return }
+        let index = button.tag
+        
+        let alert = UIAlertController(title: "Удалить привычку?", message: "Вы точно хотите удалить \"\(habits[index].title)\"?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
+            self?.habits.remove(at: index)
+            self?.updateHabitsProgress()
+        }))
+        
+        present(alert, animated: true)
+    }
 
     
     private func reloadHabitStack() {
@@ -373,10 +430,17 @@ class HomeViewController: UIViewController {
             button.contentHorizontalAlignment = .left
             button.tag = index
             button.addTarget(self, action: #selector(toggleHabit(_:)), for: .touchUpInside)
+            
+            // Добавляем длинное нажатие для удаления
+            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+            button.addGestureRecognizer(longPress)
+
             habitStack.addArrangedSubview(button)
         }
-        updateHabitsProgress() // ← обновляем прогресс после полной перезагрузки
+        updateHabitsProgress() // обновляем прогресс после полной перезагрузки
     }
+
+    
 
     private func updateHabitsProgress() {
         let completed = habits.filter { $0.isCompleted }.count
