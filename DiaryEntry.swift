@@ -5,6 +5,7 @@ struct DiaryEntry: Codable {
     let text: String
     let mood: String
     let imageData: Data?
+    let tags: [String]
 }
 class DiaryStorage {
 
