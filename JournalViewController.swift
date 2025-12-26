@@ -2,10 +2,25 @@ import UIKit
 
 class JournalViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    private var selectedMood: String?
+    private var selectedColor: UIColor?
+
+    let dayColors: [UIColor] = [
+        UIColor(red: 0.55, green: 0.12, blue: 0.12, alpha: 1), // тёмно-красный
+        UIColor.systemPink,
+        UIColor.systemPurple,
+        UIColor.systemBlue,
+        UIColor.systemYellow
+    ]
+    
+    private var tags: [String] = []
+
+
+
     // MARK: - UI Elements
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Дневник и привычки"
+        label.text = "Мой дневник"
         label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         label.textAlignment = .center
         label.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
@@ -14,7 +29,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Отслеживайте свой день"
+        label.text = "Расскажи о своем дне"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .center
         label.textColor = UIColor(red: 0.52, green: 0.44, blue: 0.35, alpha: 1)
@@ -34,7 +49,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     
     private let moodQuestionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Как прошел ваш день?"
+        label.text = "Как оцените свой день?"
         label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         label.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         return label
@@ -51,6 +66,17 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return label
     }()
     
+    private let colorLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Цвет дня"
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        label.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
+        return label
+    }()
+
+    private let colorStack = UIStackView()
+    private var colorButtons: [UIButton] = []
+
     private let textView: UITextView = {
         let tv = UITextView()
         tv.font = UIFont.systemFont(ofSize: 16)
@@ -62,6 +88,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return tv
     }()
     
+    
     private let photoCard: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
@@ -70,6 +97,8 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         view.layer.shadowOpacity = 0.2
         view.layer.shadowOffset = CGSize(width: 0, height: 2)
         view.layer.shadowRadius = 3
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor(red: 0.78, green: 0.70, blue: 0.60, alpha: 1).cgColor
         return view
     }()
     
@@ -95,7 +124,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
+        view.backgroundColor = AppColors.background
         setupUI()
         setupMoodButtons()
         addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
@@ -231,6 +260,8 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         ])
     }
     
+    
+    
     // MARK: - Mood Buttons
     // MARK: - UI Elements
     private let saveButton: UIButton = {
@@ -287,9 +318,11 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     
     @objc private func moodButtonTapped(_ sender: UIButton) {
         for button in moodButtons {
-            button.backgroundColor = UIColor(red: 0.94, green: 0.93, blue: 0.92, alpha: 1)
-        }
-        sender.backgroundColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+                button.backgroundColor = UIColor(red: 0.94, green: 0.93, blue: 0.92, alpha: 1)
+            }
+            sender.backgroundColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+
+            selectedMood = sender.title(for: .normal)
     }
     
     // MARK: - Photo Selection
@@ -300,16 +333,52 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         present(picker, animated: true)
     }
     @objc private func saveButtonTapped() {
-        // Пока просто выводим данные в консоль
-        print("Сохраняем запись:")
-        print("Текст: \(textView.text ?? "")")
-        if let _ = photoImageView.image {
-            print("Фото выбрано")
-        } else {
-            print("Фото не выбрано")
+
+        // Проверка выбора эмоции
+        guard let mood = selectedMood else {
+            let alert = UIAlertController(
+                title: "Выберите эмоцию",
+                message: "Пожалуйста, выберите настроение перед сохранением записи",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Ок", style: .default))
+            present(alert, animated: true)
+            return
         }
-        // Здесь позже будет сохранение в дневник
+
+        let text = textView.text ?? ""
+        let date = Date()
+
+        var imageData: Data? = nil
+        if let image = photoImageView.image {
+            imageData = image.jpegData(compressionQuality: 0.8)
+        }
+
+        let entry = DiaryEntry(
+            date: date,
+            text: text,
+            mood: mood,
+            imageData: imageData
+        )
+
+        DiaryStorage.shared.save(entry: entry)
+
+        // Очистка формы
+        textView.text = ""
+        photoImageView.image = nil
+        addPhotoButton.isHidden = false
+        selectedMood = nil
+
+        let alert = UIAlertController(
+            title: "Сохранено",
+            message: "Запись добавлена в дневник",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
     }
+
+
 
 }
 
