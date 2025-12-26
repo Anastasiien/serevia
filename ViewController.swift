@@ -80,7 +80,7 @@ class HomeViewController: UIViewController {
         
         lastStreakDate = today
         
-        streakNumber.text = "\(currentStreak) 🔥"
+        streakNumber.text = "\(currentStreak)"
         topLabel.text = "Топ: \(topStreak)"
     }
 
@@ -392,7 +392,7 @@ class HomeViewController: UIViewController {
         guard gesture.state == .began, let button = gesture.view as? UIButton else { return }
         let index = button.tag
         
-        let alert = UIAlertController(title: "Удалить привычку?", message: "Вы точно хотите удалить \"\(habits[index].title)\"?",         preferredStyle: .alert
+        let alert = UIAlertController(title: "Удалить привычку?", message: "Вы уверены, что хотите удалить \"\(habits[index].title)\"?",         preferredStyle: .alert
         )
 
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
