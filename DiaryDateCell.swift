@@ -45,13 +45,19 @@ class DiaryDateCell: UICollectionViewCell {
             stack.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8)
         ])
     }
-
+    
     func configure(with entry: DiaryEntry) {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMM"
-
         dateLabel.text = formatter.string(from: entry.date)
         moodLabel.text = entry.mood
+
+        // Если у записи сохранен цвет, красим фон ячейки, если нет — ставим стандартный
+        if let hexColor = entry.color, let savedColor = UIColor(hex: hexColor) {
+            backgroundColor = savedColor
+        } else {
+            backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
+        }
     }
 }
