@@ -643,16 +643,33 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         
         DiaryStorage.shared.save(entry: entry)
         
-        // Очистка UI после сохранения
+        // Очистка текста и фото
         textView.text = ""
         photoImageView.image = nil
         addPhotoButton.isHidden = false
+
+        // СБРОС СМАЙЛИКА (настроения)
+        moodButtons.forEach {
+            $0.backgroundColor = UIColor(red: 0.94, green: 0.93, blue: 0.92, alpha: 1)
+        }
         selectedMood = nil
+
+        // СБРОС ЦВЕТА ДНЯ
+        colorButtons.forEach {
+            $0.layer.borderColor = UIColor.clear.cgColor
+        }
+        photoCard.layer.borderColor = UIColor(
+            red: 0.78,
+            green: 0.70,
+            blue: 0.60,
+            alpha: 1
+        ).cgColor
         selectedColor = nil
-        
-        // Сброс выбранных тегов
+
+        // СБРОС ТЕГОВ
         selectedTags = []
-        setupTagButtons() // обновляем кнопки тегов
+        setupTagButtons()
+
         
         let alert = UIAlertController(title: "Сохранено", message: "Запись добавлена в дневник", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ок", style: .default))
