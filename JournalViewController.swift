@@ -85,7 +85,22 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         present(alert, animated: true)
     }
     
+    private let colorSelectionBorder = UIColor(
+        red: 0.53,
+        green: 0.43,
+        blue: 0.34,
+        alpha: 1.0
+    )
     
+    private let cardButtonColor = UIColor(
+        red: 0.88,
+        green: 0.84,
+        blue: 0.76,
+        alpha: 1.0
+    )
+
+
+
     // MARK: - Tags logic
     private func setupTagButtons() {
         // Очищаем старые кнопки
@@ -99,8 +114,11 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         for tag in tags {
             let btn = UIButton(type: .system)
             btn.setTitle(tag, for: .normal)
-            btn.setTitleColor(.white, for: .normal)
-            
+            btn.setTitleColor(
+                UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1),
+                for: .normal
+            )
+
             btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
             btn.titleLabel?.lineBreakMode = .byClipping
             btn.titleLabel?.numberOfLines = 1
@@ -108,8 +126,9 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             btn.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
             
             btn.backgroundColor = selectedTags.contains(tag)
-            ? UIColor(red: 0.55, green: 0.4, blue: 0.95, alpha: 1)
-            : UIColor.systemGray3
+                ? UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1) // цвет при выборе
+                : cardButtonColor
+
             
             btn.layer.cornerRadius = 12
             
@@ -141,12 +160,18 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         
         if selectedTags.contains(title) {
             selectedTags.removeAll { $0 == title }
-            sender.backgroundColor = .systemGray3
+            sender.backgroundColor = cardButtonColor
         } else {
             selectedTags.append(title)
-            sender.backgroundColor = UIColor(red: 0.55, green: 0.4, blue: 0.95, alpha: 1)
+            sender.backgroundColor = UIColor(
+                red: 0.53,
+                green: 0.43,
+                blue: 0.34,
+                alpha: 1
+            )
         }
     }
+
     
     @objc private func addNewTagTapped() {
         let alert = UIAlertController(title: "Новый тег",
@@ -328,14 +353,21 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         colorStack.addArrangedSubview(addButton)
     }
     
+    @available(iOS 14.0, *)
     @objc private func addNewColorTapped() {
-        if #available(iOS 14.0, *) {
-            let picker = UIColorPickerViewController()
-            picker.delegate = self
-            picker.supportsAlpha = false
-            present(picker, animated: true)
-        }
+        let colorPicker = UIColorPickerViewController()
+        colorPicker.delegate = self
+        present(colorPicker, animated: true)
     }
+
+    
+    @objc private func colorTapped(_ sender: UIButton) {
+        colorButtons.forEach { $0.layer.borderColor = UIColor.clear.cgColor }
+        sender.layer.borderColor = colorSelectionBorder.cgColor
+        selectedColor = sender.backgroundColor
+        photoCard.layer.borderColor = colorSelectionBorder.cgColor
+    }
+
     
     
     private func createColorButton(color: UIColor, size: CGFloat) -> UIButton {
@@ -395,16 +427,10 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         colorStack.insertArrangedSubview(pastelBtn, at: colorStack.arrangedSubviews.count - 1)
         selectedColor = pastelBtn.backgroundColor
         colorButtons.forEach { $0.layer.borderColor = UIColor.clear.cgColor }
-        pastelBtn.layer.borderColor = UIColor.black.cgColor
+        pastelBtn.layer.borderColor = colorSelectionBorder.cgColor
     }
     
-    @objc private func colorTapped(_ sender: UIButton) {
-        colorButtons.forEach { $0.layer.borderColor = UIColor.clear.cgColor }
-        sender.layer.borderColor = UIColor.black.cgColor
-        selectedColor = sender.backgroundColor
-        photoCard.layer.borderColor = selectedColor?.cgColor
-    }
-    
+
     // MARK: - UI Setup
     private func setupUI() {
         let scrollView = UIScrollView()
