@@ -42,6 +42,44 @@ class DiaryDetailViewController: UIViewController {
     }
 
     private func setupUI() {
+        view.backgroundColor = UIColor(red: 0.95, green: 0.93, blue: 0.88, alpha: 1.0)
+
+        // MARK: - ScrollView
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.showsVerticalScrollIndicator = true
+        view.addSubview(scrollView)
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+
+        // MARK: - Основной стек
+        let mainStack = UIStackView()
+        mainStack.axis = .vertical
+        mainStack.spacing = 24
+        mainStack.alignment = .fill
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(mainStack)
+        NSLayoutConstraint.activate([
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+        ])
 
         // MARK: - Дата
         let dateLabel = UILabel()
@@ -54,7 +92,7 @@ class DiaryDetailViewController: UIViewController {
         formatter.dateFormat = "d MMMM yyyy"
         dateLabel.text = formatter.string(from: entry.date)
 
-        // MARK: - Цвет
+        // MARK: - Цвет и эмоция
         let colorView = UIView()
         colorView.layer.cornerRadius = 16
         colorView.layer.borderWidth = 1
@@ -68,7 +106,6 @@ class DiaryDetailViewController: UIViewController {
             colorView.backgroundColor = uiColor
         }
 
-        // MARK: - Эмоция
         let moodLabel = UILabel()
         moodLabel.font = UIFont.systemFont(ofSize: 36)
         moodLabel.text = entry.mood
@@ -91,7 +128,6 @@ class DiaryDetailViewController: UIViewController {
         emotionStack.spacing = 20
         emotionStack.alignment = .center
 
-        // MARK: - Карточка информации
         let infoCard = UIStackView(arrangedSubviews: [dateLabel, emotionStack])
         infoCard.axis = .vertical
         infoCard.spacing = 12
@@ -100,62 +136,68 @@ class DiaryDetailViewController: UIViewController {
         infoCard.layer.cornerRadius = 16
         infoCard.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         infoCard.isLayoutMarginsRelativeArrangement = true
-
-        // MARK: - Теги с горизонтальным скроллом
-        let tagsScroll = UIScrollView()
-        tagsScroll.showsHorizontalScrollIndicator = false
-
-        let tagsContainer = UIStackView()
-        tagsContainer.axis = .horizontal
-        tagsContainer.spacing = 8
-        tagsContainer.alignment = .center
-
-        tagsScroll.addSubview(tagsContainer)
-        tagsContainer.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tagsContainer.topAnchor.constraint(equalTo: tagsScroll.topAnchor),
-            tagsContainer.bottomAnchor.constraint(equalTo: tagsScroll.bottomAnchor),
-            tagsContainer.leadingAnchor.constraint(equalTo: tagsScroll.leadingAnchor),
-            tagsContainer.trailingAnchor.constraint(equalTo: tagsScroll.trailingAnchor),
-            tagsContainer.heightAnchor.constraint(equalTo: tagsScroll.heightAnchor)
-        ])
-
-        for tag in entry.tags {
-            let label = UILabel()
-            label.text = "#\(tag)"
-            label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-            label.textColor = UIColor(red: 0.45, green: 0.36, blue: 0.28, alpha: 1.0)
-            label.textAlignment = .center
-
-            let container = UIView()
-            container.backgroundColor = UIColor(red: 0.93, green: 0.89, blue: 0.82, alpha: 1.0)
-            container.layer.cornerRadius = 14
-            container.clipsToBounds = true
-
-            container.addSubview(label)
-            label.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                label.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
-                label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6),
-                label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
-                label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
-            ])
-
-            tagsContainer.addArrangedSubview(container)
-        }
-
-        // MARK: - Основной стек
-        let mainStack = UIStackView()
-        mainStack.axis = .vertical
-        mainStack.spacing = 24
-        mainStack.alignment = .fill
-
         mainStack.addArrangedSubview(infoCard)
 
+        // MARK: - Теги с горизонтальным скроллом
         if !entry.tags.isEmpty {
+            let tagsScroll = UIScrollView()
+            tagsScroll.showsHorizontalScrollIndicator = false
+            tagsScroll.translatesAutoresizingMaskIntoConstraints = false
+            let tagsStack = UIStackView()
+            tagsStack.axis = .horizontal
+            tagsStack.spacing = 8
+            tagsStack.alignment = .center
+            tagsStack.distribution = .fillProportionally
+            tagsStack.translatesAutoresizingMaskIntoConstraints = false
+            tagsScroll.addSubview(tagsStack)
+            NSLayoutConstraint.activate([
+                tagsStack.topAnchor.constraint(equalTo: tagsScroll.topAnchor),
+                tagsStack.bottomAnchor.constraint(equalTo: tagsScroll.bottomAnchor),
+                tagsStack.leadingAnchor.constraint(equalTo: tagsScroll.leadingAnchor),
+                tagsStack.trailingAnchor.constraint(equalTo: tagsScroll.trailingAnchor),
+                tagsStack.heightAnchor.constraint(equalTo: tagsScroll.heightAnchor)
+            ])
+            for tag in entry.tags {
+                let label = UILabel()
+                label.text = "#\(tag)"
+                label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+                label.textColor = UIColor(red: 0.45, green: 0.36, blue: 0.28, alpha: 1.0)
+                label.textAlignment = .center
+                label.isUserInteractionEnabled = false
+
+                let container = UIView()
+                container.backgroundColor = UIColor(red: 0.93, green: 0.89, blue: 0.82, alpha: 1.0)
+                container.layer.cornerRadius = 14
+                container.clipsToBounds = true
+                container.addSubview(label)
+
+                label.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    label.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
+                    label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6),
+                    label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+                    label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
+                ])
+                tagsStack.addArrangedSubview(container)
+            }
             mainStack.addArrangedSubview(tagsScroll)
-            tagsScroll.heightAnchor.constraint(equalToConstant: 40).isActive = true
         }
+
+        // MARK: - Картинка (если есть)
+        if let imageData = entry.imageData, let image = UIImage(data: imageData) {
+            let imageView = UIImageView(image: image)
+            imageView.contentMode = .scaleAspectFit
+            imageView.layer.cornerRadius = 12
+            imageView.clipsToBounds = true
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+
+            mainStack.addArrangedSubview(imageView)
+
+            // Ограничиваем максимальную высоту
+            imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 300).isActive = true
+        }
+
+
 
         // MARK: - Текст
         if !entry.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -180,13 +222,6 @@ class DiaryDetailViewController: UIViewController {
 
             mainStack.addArrangedSubview(textContainer)
         }
-
-        view.addSubview(mainStack)
-        mainStack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            mainStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        ])
     }
+
 }
