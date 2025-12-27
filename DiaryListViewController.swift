@@ -4,7 +4,7 @@ class DiaryListViewController: UIViewController {
 
     private var entries: [DiaryEntry] = []
 
-    private let collectionView: UICollectionView = {
+    private var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let width = (UIScreen.main.bounds.width - 16 * 3) / 2
         layout.itemSize = CGSize(width: width, height: width)
@@ -61,20 +61,31 @@ class DiaryListViewController: UIViewController {
 
 
     private func setupCollectionView() {
-        view.addSubview(collectionView)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        let layout = UICollectionViewFlowLayout()
+        
+        let spacing: CGFloat = 16
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
 
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
+        let width = (UIScreen.main.bounds.width - spacing * 3) / 2
+        layout.itemSize = CGSize(width: width, height: width)
+        
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(DiaryDateCell.self, forCellWithReuseIdentifier: "DiaryDateCell")
+
+        view.addSubview(collectionView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: spacing),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: spacing),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -spacing),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
+
 }
 extension DiaryListViewController: UICollectionViewDataSource, UICollectionViewDelegate {
 
