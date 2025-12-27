@@ -22,7 +22,6 @@ extension UIColor {
     }
 }
 
-// MARK: - ViewController
 class DiaryDetailViewController: UIViewController {
 
     private let entry: DiaryEntry
@@ -65,7 +64,6 @@ class DiaryDetailViewController: UIViewController {
             colorView.widthAnchor.constraint(equalToConstant: 32),
             colorView.heightAnchor.constraint(equalToConstant: 32)
         ])
-
         if let hex = entry.color, let uiColor = UIColor.fromHex(hex) {
             colorView.backgroundColor = uiColor
         }
@@ -93,7 +91,7 @@ class DiaryDetailViewController: UIViewController {
         emotionStack.spacing = 20
         emotionStack.alignment = .center
 
-        // MARK: - Карточка с датой
+        // MARK: - Карточка информации
         let infoCard = UIStackView(arrangedSubviews: [dateLabel, emotionStack])
         infoCard.axis = .vertical
         infoCard.spacing = 12
@@ -103,17 +101,47 @@ class DiaryDetailViewController: UIViewController {
         infoCard.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         infoCard.isLayoutMarginsRelativeArrangement = true
 
-        // MARK: - Фото
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 16
+        // MARK: - Теги с горизонтальным скроллом
+        let tagsScroll = UIScrollView()
+        tagsScroll.showsHorizontalScrollIndicator = false
 
-        if let data = entry.imageData {
-            imageView.image = UIImage(data: data)
-            imageView.heightAnchor.constraint(equalToConstant: 220).isActive = true
-        } else {
-            imageView.heightAnchor.constraint(equalToConstant: 0).isActive = true
+        let tagsContainer = UIStackView()
+        tagsContainer.axis = .horizontal
+        tagsContainer.spacing = 8
+        tagsContainer.alignment = .center
+
+        tagsScroll.addSubview(tagsContainer)
+        tagsContainer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tagsContainer.topAnchor.constraint(equalTo: tagsScroll.topAnchor),
+            tagsContainer.bottomAnchor.constraint(equalTo: tagsScroll.bottomAnchor),
+            tagsContainer.leadingAnchor.constraint(equalTo: tagsScroll.leadingAnchor),
+            tagsContainer.trailingAnchor.constraint(equalTo: tagsScroll.trailingAnchor),
+            tagsContainer.heightAnchor.constraint(equalTo: tagsScroll.heightAnchor)
+        ])
+
+        for tag in entry.tags {
+            let label = UILabel()
+            label.text = "#\(tag)"
+            label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+            label.textColor = UIColor(red: 0.45, green: 0.36, blue: 0.28, alpha: 1.0)
+            label.textAlignment = .center
+
+            let container = UIView()
+            container.backgroundColor = UIColor(red: 0.93, green: 0.89, blue: 0.82, alpha: 1.0)
+            container.layer.cornerRadius = 14
+            container.clipsToBounds = true
+
+            container.addSubview(label)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                label.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
+                label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6),
+                label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+                label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
+            ])
+
+            tagsContainer.addArrangedSubview(container)
         }
 
         // MARK: - Основной стек
@@ -124,9 +152,13 @@ class DiaryDetailViewController: UIViewController {
 
         mainStack.addArrangedSubview(infoCard)
 
-        // MARK: - Текст (ТОЛЬКО ЕСЛИ ОН ЕСТЬ)
-        if !entry.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if !entry.tags.isEmpty {
+            mainStack.addArrangedSubview(tagsScroll)
+            tagsScroll.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        }
 
+        // MARK: - Текст
+        if !entry.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let textLabel = UILabel()
             textLabel.font = UIFont.systemFont(ofSize: 16)
             textLabel.textColor = UIColor(red: 0.25, green: 0.20, blue: 0.15, alpha: 1.0)
@@ -148,8 +180,6 @@ class DiaryDetailViewController: UIViewController {
 
             mainStack.addArrangedSubview(textContainer)
         }
-
-        mainStack.addArrangedSubview(imageView)
 
         view.addSubview(mainStack)
         mainStack.translatesAutoresizingMaskIntoConstraints = false
