@@ -4,8 +4,11 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     
     private var selectedMood: String?
     private var selectedColor: UIColor?
-    
-    let dayColors: [UIColor] = [
+    private let customColorsKey = "customColors"
+    private var customColorButtons: [UIButton] = []
+
+    // Это цвета по умолчанию, которые появятся только ОДИН РАЗ при первом запуске
+    private let defaultColors: [UIColor] = [
         UIColor(red: 1.0, green: 0.6, blue: 0.6, alpha: 1),
         UIColor(red: 1.0, green: 0.7, blue: 0.85, alpha: 1),
         UIColor(red: 1.0, green: 0.9, blue: 0.5, alpha: 1),
@@ -13,6 +16,10 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         UIColor(red: 0.55, green: 0.8, blue: 0.95, alpha: 1),
         UIColor(red: 0.4, green: 0.6, blue: 0.95, alpha: 1)
     ]
+
+    // Текущий список цветов, который будет отображаться в UI
+    private var currentColors: [UIColor] = []
+    private let colorsKey = "saved_colors_list"
     
     // MARK: - Tags
     private var tags: [String] = ["Работа", "Учёба", "Отдых", "Семья", "Здоровье"]
@@ -70,16 +77,23 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         
         alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self = self,
+                  let index = self.tagButtons.firstIndex(of: button) // Исправлено: tagButtons
+            else { return }
+
+            // 1. Удаляем из UI массива кнопок
+            self.tagButtons.remove(at: index)
+            button.removeFromSuperview()
+
+            // 2. Удаляем из основного массива строк (tags)
+            if let tagIndex = self.tags.firstIndex(of: tagTitle) {
+                self.tags.remove(at: tagIndex)
+            }
             
-            // Удаляем из списка тегов
-            self.tags.removeAll { $0 == tagTitle }
-            
-            // Удаляем из выбранных (если был выбран)
+            // 3. Удаляем из выбранных, если он там был
             self.selectedTags.removeAll { $0 == tagTitle }
             
-            // Перерисовываем кнопки
-            self.setupTagButtons()
+            // Если вы сохраняете теги в UserDefaults, не забудьте вызвать метод сохранения здесь
         })
         
         present(alert, animated: true)
@@ -254,8 +268,23 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return label
     }()
     
-    private let colorStack = UIStackView()
+    private let colorScrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.showsHorizontalScrollIndicator = false
+        sv.alwaysBounceHorizontal = true
+        return sv
+    }()
+
+    private let colorStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 12
+        stack.alignment = .center
+        return stack
+    }()
+
     private var colorButtons: [UIButton] = []
+
     
     private let textView: UITextView = {
         let tv = UITextView()
@@ -310,35 +339,69 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return btn
     }()
     
+    private func loadCustomColorsIntoUI() {
+        let savedColors = loadSavedColors()
+        guard !savedColors.isEmpty else { return }
+
+        let buttonSize: CGFloat = 40
+
+        for color in savedColors {
+            let btn = createColorButton(
+                color: pastelColor(from: color),
+                size: buttonSize
+            )
+            colorButtons.append(btn)
+            colorStack.insertArrangedSubview(
+                btn,
+                at: colorStack.arrangedSubviews.count - 1
+            )
+        }
+    }
+
+    private func saveColors(_ colors: [UIColor]) {
+        let data = colors.compactMap {
+            try? NSKeyedArchiver.archivedData(withRootObject: $0, requiringSecureCoding: false)
+        }
+        UserDefaults.standard.set(data, forKey: customColorsKey)
+    }
+
+
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = AppColors.background
+        
+        // Сначала загружаем данные из памяти
+        currentColors = loadSavedColors()
+        
+        // Если цветов нет в памяти, используем базовые
+        if currentColors.isEmpty {
+            currentColors = defaultColors
+            saveColors(currentColors)
+        }
+        
         setupUI()
         setupMoodButtons()
         setupColorButtons()
-        addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
-        saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     }
-    
+
     // MARK: - Color Buttons
     private func setupColorButtons() {
-        colorStack.axis = .horizontal
-        colorStack.spacing = 12
-        colorStack.distribution = .fillEqually
+        // Очищаем старые кнопки из стека (на случай перерисовки)
+        colorStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        colorButtons.removeAll()
+
         let buttonSize: CGFloat = 40
-        
-        // Существующие цвета
-        for color in dayColors {
+
+        // Рисуем все доступные цвета
+        for color in currentColors {
             let btn = createColorButton(color: color, size: buttonSize)
             colorButtons.append(btn)
             colorStack.addArrangedSubview(btn)
         }
-        
-        
-        
-        // Кнопка "+"
+
+        // Кнопка "+" всегда в конце
         let addButton = UIButton(type: .system)
         addButton.setTitle("+", for: .normal)
         addButton.setTitleColor(.black, for: .normal)
@@ -346,19 +409,54 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         addButton.layer.cornerRadius = buttonSize / 2
         addButton.layer.borderWidth = 1
         addButton.layer.borderColor = UIColor.gray.cgColor
+        addButton.addTarget(self, action: #selector(addNewColorTapped), for: .touchUpInside)
+        
         addButton.translatesAutoresizingMaskIntoConstraints = false
         addButton.heightAnchor.constraint(equalToConstant: buttonSize).isActive = true
         addButton.widthAnchor.constraint(equalToConstant: buttonSize).isActive = true
-        addButton.addTarget(self, action: #selector(addNewColorTapped), for: .touchUpInside)
+
         colorStack.addArrangedSubview(addButton)
     }
     
+    private func loadSavedColors() -> [UIColor] {
+        guard let dataArray = UserDefaults.standard.array(forKey: customColorsKey) as? [Data] else {
+            return []
+        }
+
+        return dataArray.compactMap {
+            try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData($0) as? UIColor
+        }
+    }
+
+    
     @available(iOS 14.0, *)
     @objc private func addNewColorTapped() {
-        let colorPicker = UIColorPickerViewController()
-        colorPicker.delegate = self
-        present(colorPicker, animated: true)
+        let picker = UIColorPickerViewController()
+        picker.delegate = self
+        present(picker, animated: true)
     }
+    
+    private func saveColor(_ color: UIColor) {
+        var colors = loadSavedColors()
+        colors.append(color)
+        saveColors(colors)
+    }
+
+
+
+    
+
+    @available(iOS 14.0, *)
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        let pastel = pastelColor(from: color)
+        
+        currentColors.append(pastel)
+        saveColors(currentColors)
+        setupColorButtons() // Перерисовываем всё
+    }
+
+
 
     
     @objc private func colorTapped(_ sender: UIButton) {
@@ -388,24 +486,38 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     
     @objc private func colorButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
         guard sender.state == .began, let button = sender.view as? UIButton else { return }
-        
+        guard let index = colorButtons.firstIndex(of: button) else { return }
+
         let alert = UIAlertController(
             title: "Удалить цвет?",
-            message: "Вы уверены, что хотите удалить этот цвет?",
+            message: "Вы уверены, что хотите удалить этот цвет из списка?",
             preferredStyle: .alert
         )
-        
+
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            if let index = self.colorButtons.firstIndex(of: button) {
-                self.colorButtons.remove(at: index)
-                button.removeFromSuperview()
-            }
-        }))
-        
+
+            // Удаляем из данных
+            self.currentColors.remove(at: index)
+
+            // Сохраняем обновленный список в память
+            self.saveColors(self.currentColors)
+
+            // Обновляем интерфейс
+            self.setupColorButtons()
+
+            // Сбрасываем выбор, если удалили выбранный цвет
+            self.selectedColor = nil
+            self.photoCard.layer.borderColor = UIColor(
+                red: 0.78, green: 0.70, blue: 0.60, alpha: 1
+            ).cgColor
+        })
+
         present(alert, animated: true)
     }
+
+
     
     
     
@@ -497,19 +609,29 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         ])
         
         scrollView.addSubview(colorLabel)
-        scrollView.addSubview(colorStack)
+        scrollView.addSubview(colorScrollView)
+        colorScrollView.addSubview(colorStack)
+
         colorLabel.translatesAutoresizingMaskIntoConstraints = false
+        colorScrollView.translatesAutoresizingMaskIntoConstraints = false
         colorStack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             colorLabel.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 20),
             colorLabel.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
-            
-            colorStack.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 12),
-            colorStack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
-            colorStack.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
-            colorStack.heightAnchor.constraint(equalToConstant: 44)
+
+            colorScrollView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 12),
+            colorScrollView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            colorScrollView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
+            colorScrollView.heightAnchor.constraint(equalToConstant: 44),
+
+            colorStack.topAnchor.constraint(equalTo: colorScrollView.contentLayoutGuide.topAnchor),
+            colorStack.bottomAnchor.constraint(equalTo: colorScrollView.contentLayoutGuide.bottomAnchor),
+            colorStack.leadingAnchor.constraint(equalTo: colorScrollView.contentLayoutGuide.leadingAnchor),
+            colorStack.trailingAnchor.constraint(equalTo: colorScrollView.contentLayoutGuide.trailingAnchor),
+            colorStack.heightAnchor.constraint(equalTo: colorScrollView.frameLayoutGuide.heightAnchor)
         ])
+
         
         // ИСПРАВЛЕННЫЙ БЛОК ТЕГОВ
         scrollView.addSubview(tagsLabel)
