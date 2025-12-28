@@ -138,6 +138,8 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         }
         tagButtons.removeAll()
         
+        let buttonHeight: CGFloat = 28 // высота для всех тегов
+        
         // Создаём кнопки тегов
         for tag in tags {
             let btn = UIButton(type: .system)
@@ -146,41 +148,41 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
                 UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1),
                 for: .normal
             )
-
             btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-            btn.titleLabel?.lineBreakMode = .byClipping
-            btn.titleLabel?.numberOfLines = 1
-            
             btn.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
-            
             btn.backgroundColor = selectedTags.contains(tag)
-                ? UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1) // цвет при выборе
+                ? UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
                 : cardButtonColor
-
             
-            btn.layer.cornerRadius = 12
-            
-            // КЛЮЧЕВОЕ — запрещаем сжатие текста
+            btn.layer.cornerRadius = buttonHeight / 2
             btn.setContentHuggingPriority(.required, for: .horizontal)
             btn.setContentCompressionResistancePriority(.required, for: .horizontal)
-            
             btn.addTarget(self, action: #selector(tagTapped(_:)), for: .touchUpInside)
-            
-            let longPress = UILongPressGestureRecognizer(
-                target: self,
-                action: #selector(tagLongPressed(_:))
-            )
+
+            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(tagLongPressed(_:)))
             btn.addGestureRecognizer(longPress)
             
             tagButtons.append(btn)
             tagsStack.addArrangedSubview(btn)
         }
         
-        // Кнопка "+"
-        tagsStack.addArrangedSubview(addTagButton)
-        addTagButton.removeTarget(nil, action: nil, for: .allEvents)
-        addTagButton.addTarget(self, action: #selector(addNewTagTapped), for: .touchUpInside)
+        // Кнопка "+" для тегов в стиле цветов
+        let addButton = UIButton(type: .system)
+        addButton.setTitle("+", for: .normal)
+        addButton.setTitleColor(.black, for: .normal)
+        addButton.backgroundColor = UIColor(white: 0.95, alpha: 1)
+        addButton.layer.cornerRadius = buttonHeight / 2
+        addButton.layer.borderWidth = 1
+        addButton.layer.borderColor = UIColor.gray.cgColor
+        addButton.addTarget(self, action: #selector(addNewTagTapped), for: .touchUpInside)
+        
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+        addButton.heightAnchor.constraint(equalToConstant: buttonHeight).isActive = true
+        addButton.widthAnchor.constraint(equalTo: addButton.heightAnchor).isActive = true
+        
+        tagsStack.addArrangedSubview(addButton)
     }
+
     
     
     @objc private func tagTapped(_ sender: UIButton) {
@@ -866,3 +868,4 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         
     }
     
+
