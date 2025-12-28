@@ -5,6 +5,8 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     private var selectedMood: String?
     private var selectedColor: UIColor?
     private let customColorsKey = "customColors"
+    private let tagsKey = "saved_tags"
+
     private var customColorButtons: [UIButton] = []
 
     // Это цвета по умолчанию, которые появятся только ОДИН РАЗ при первом запуске
@@ -20,7 +22,16 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     // Текущий список цветов, который будет отображаться в UI
     private var currentColors: [UIColor] = []
     private let colorsKey = "saved_colors_list"
-    
+    private func saveTags() {
+        UserDefaults.standard.set(tags, forKey: tagsKey)
+    }
+
+    private func loadTags() {
+        if let savedTags = UserDefaults.standard.array(forKey: tagsKey) as? [String] {
+            tags = savedTags
+        }
+    }
+
     // MARK: - Tags
     private var tags: [String] = ["Работа", "Учёба", "Отдых", "Семья", "Здоровье"]
     private var selectedTags: [String] = []
@@ -67,18 +78,19 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
               let button = gesture.view as? UIButton,
               let tagTitle = button.title(for: .normal)
         else { return }
-        
+
         let alert = UIAlertController(
             title: "Удалить тег?",
             message: "Вы уверены, что хотите удалить тег «\(tagTitle)»",
             preferredStyle: .alert
         )
-        
+
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        
+
+        // Здесь заменяем старый блок на новый
         alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
             guard let self = self,
-                  let index = self.tagButtons.firstIndex(of: button) // Исправлено: tagButtons
+                  let index = self.tagButtons.firstIndex(of: button)
             else { return }
 
             // 1. Удаляем из UI массива кнопок
@@ -89,15 +101,17 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             if let tagIndex = self.tags.firstIndex(of: tagTitle) {
                 self.tags.remove(at: tagIndex)
             }
-            
+
             // 3. Удаляем из выбранных, если он там был
             self.selectedTags.removeAll { $0 == tagTitle }
-            
-            // Если вы сохраняете теги в UserDefaults, не забудьте вызвать метод сохранения здесь
+
+            // 4. Сохраняем обновлённый массив тегов
+            self.saveTags()
         })
-        
+
         present(alert, animated: true)
     }
+
     
     private let colorSelectionBorder = UIColor(
         red: 0.53,
@@ -203,11 +217,13 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             else { return }
             
             self.tags.append(text)
+            self.saveTags() // <-- сохраняем
             self.setupTagButtons()
         })
         
         present(alert, animated: true)
     }
+
     
     
     
@@ -360,16 +376,20 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
 
     private func saveColors(_ colors: [UIColor]) {
         let data = colors.compactMap {
-            try? NSKeyedArchiver.archivedData(withRootObject: $0, requiringSecureCoding: false)
+            try? NSKeyedArchiver.archivedData(
+                withRootObject: $0,
+                requiringSecureCoding: false
+            )
         }
         UserDefaults.standard.set(data, forKey: customColorsKey)
     }
-
 
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadTags()
+        setupTagButtons()
         view.backgroundColor = AppColors.background
         
         // Сначала загружаем данные из памяти
@@ -556,6 +576,9 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         
+        addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
+        saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
+
         let contentStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         contentStack.axis = .vertical
         contentStack.spacing = 12
