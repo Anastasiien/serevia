@@ -14,36 +14,36 @@ class MeditateViewController: UIViewController {
         case whiteNoise       = "Белый шум"
         case rain             = "Дождь"
         case sea              = "Шум моря"
-        case summerEvening    = "Вечер лета"
-        case morningMountains = "Горы"
+        case birds            = "Пение птиц"
         case train            = "Шум поезда"
         case airplane         = "Шум полета"
-        case wheatField       = "Шум поля"
-        case loFi             = "Lo-Fi"
-        case tibetanBowls     = "Чаши"
+        case cat              = "Мурчание"
+        case zenBells         = "Звон"
         case fireplace        = "Камин"
         case stream           = "Ручей"
-        case caveDrops        = "Пещера"
-        case zenBells         = "Звон"
-        case gong             = "???"
+        case tibetanBowls     = "Чаши"
+        case japan            = "Япония"
+        case africa           = "Африка"
+        case loFi             = "Lo-Fi"
+        case djaz             = "Джаз"
 
         var icon: String {
             switch self {
             case .whiteNoise:       return "📻"
             case .rain:             return "🌧"
             case .sea:              return "🌊"
-            case .summerEvening:    return "🌆"
-            case .morningMountains: return "🏔"
+            case .birds:            return "🐦"
             case .train:            return "🚆"
             case .airplane:         return "✈️"
-            case .wheatField:       return "🌾"
-            case .loFi:             return "🎧"
+            case .cat:              return "🐈"
+            case .zenBells:         return "🔔"
             case .fireplace:        return "🔥"
             case .stream:           return "🌿"
-            case .caveDrops:        return "🪨"
             case .tibetanBowls:     return "🧘‍♂️"
-            case .zenBells:         return "🔔"
-            case .gong:             return "🥁"
+            case .japan:            return "🎴"
+            case .africa:           return "🪘"
+            case .loFi:             return "🎧"
+            case .djaz:             return "🎶"
             }
         }
     }
@@ -51,6 +51,8 @@ class MeditateViewController: UIViewController {
     private var timerCard: UIView!
     private var selectedSound: Sound = .rain
     private var timerLabel = UILabel()
+    private var durationSlider = UISlider()      // ← для блокировки слайдера
+    private var soundScrollView = UIScrollView() // ← для блокировки сетки звуков
     private var categoriesScrollView: UIScrollView!
     private var categoriesStack: UIStackView!
     private let categories = ["Все", "Избранное", "Сон", "Расслабление", "Фокус"]
@@ -98,14 +100,12 @@ class MeditateViewController: UIViewController {
         // MARK: - Timer Card
         timerCard = createCardView()
 
-        // Один вертикальный стек на всю карточку
         let timerContentStack = UIStackView()
         timerContentStack.axis = .vertical
         timerContentStack.spacing = 12
         timerContentStack.translatesAutoresizingMaskIntoConstraints = false
         timerCard.addSubview(timerContentStack)
 
-        // Привязываем ко всем 4 сторонам карточки
         NSLayoutConstraint.activate([
             timerContentStack.topAnchor.constraint(equalTo: timerCard.topAnchor, constant: 16),
             timerContentStack.leadingAnchor.constraint(equalTo: timerCard.leadingAnchor, constant: 16),
@@ -113,20 +113,18 @@ class MeditateViewController: UIViewController {
             timerContentStack.bottomAnchor.constraint(equalTo: timerCard.bottomAnchor, constant: -16)
         ])
 
-        // Выберите время
         let timerTitle = UILabel()
         timerTitle.text = "Выберите время"
         timerTitle.font = .systemFont(ofSize: 16, weight: .medium)
         timerTitle.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         timerContentStack.addArrangedSubview(timerTitle)
 
-        let slider = UISlider()
-        slider.minimumValue = 1
-        slider.maximumValue = 120
-        slider.value = Float(selectedTime)
-        slider.tintColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
-        slider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
-        timerContentStack.addArrangedSubview(slider)
+        durationSlider.minimumValue = 1
+        durationSlider.maximumValue = 120
+        durationSlider.value = Float(selectedTime)
+        durationSlider.tintColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+        durationSlider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
+        timerContentStack.addArrangedSubview(durationSlider)
 
         timerLabel.text = "⏱ \(selectedTime) мин"
         timerLabel.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -134,15 +132,13 @@ class MeditateViewController: UIViewController {
         timerLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         timerContentStack.addArrangedSubview(timerLabel)
 
-        // Мелодия
         let soundTitle = UILabel()
         soundTitle.text = "Мелодия"
         soundTitle.font = .systemFont(ofSize: 16, weight: .medium)
         soundTitle.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
         timerContentStack.addArrangedSubview(soundTitle)
 
-        // ScrollView для сетки звуков
-        let soundScrollView = UIScrollView()
+        // soundScrollView — теперь свойство класса
         soundScrollView.showsVerticalScrollIndicator = true
         soundScrollView.translatesAutoresizingMaskIntoConstraints = false
         timerContentStack.addArrangedSubview(soundScrollView)
@@ -169,7 +165,6 @@ class MeditateViewController: UIViewController {
             soundGridStack.widthAnchor.constraint(equalTo: soundScrollView.widthAnchor)
         ])
 
-        // Кнопки 3 в ряд
         var currentRowStack: UIStackView?
         for (index, sound) in Sound.allCases.enumerated() {
             if index % 3 == 0 {
@@ -196,7 +191,6 @@ class MeditateViewController: UIViewController {
             currentRowStack?.addArrangedSubview(button)
         }
 
-        // Кнопки Начать / Остановить — прямо в timerContentStack
         startButton.setTitle("Начать", for: .normal)
         startButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         startButton.backgroundColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
@@ -233,12 +227,10 @@ class MeditateViewController: UIViewController {
         ])
         setupCategoryButtons()
 
-        // MARK: - Meditations Stack
         meditationsStack.axis = .vertical
         meditationsStack.spacing = 12
         meditationsStack.translatesAutoresizingMaskIntoConstraints = false
 
-        // MARK: - Main Stack
         let mainStack = UIStackView(arrangedSubviews: [
             titleLabel,
             subtitleLabel,
@@ -252,7 +244,6 @@ class MeditateViewController: UIViewController {
         mainStack.isLayoutMarginsRelativeArrangement = true
         mainStack.layoutMargins = UIEdgeInsets(top: 8, left: 20, bottom: 24, right: 20)
 
-        // MARK: - Page Scroll
         let pageScrollView = UIScrollView()
         pageScrollView.showsVerticalScrollIndicator = false
         pageScrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -275,18 +266,25 @@ class MeditateViewController: UIViewController {
         ])
     }
 
+    // MARK: - Блокировка / разблокировка слайдера и сетки звуков
+    private func lockControls() {
+        durationSlider.isUserInteractionEnabled = false
+        durationSlider.alpha = 0.4
+        soundScrollView.isUserInteractionEnabled = false
+        soundScrollView.alpha = 0.4
+    }
+
+    private func unlockControls() {
+        durationSlider.isUserInteractionEnabled = true
+        durationSlider.alpha = 1.0
+        soundScrollView.isUserInteractionEnabled = true
+        soundScrollView.alpha = 1.0
+    }
+
     // MARK: - Timer Actions
     @objc private func sliderChanged(_ sender: UISlider) {
         selectedTime = Int(sender.value)
         timerLabel.text = "⏱ \(selectedTime) мин"
-        if timer != nil {
-            timer?.invalidate()
-            timer = nil
-            remainingSeconds = 0
-            updateTimerLabel()
-            startButton.setTitle("Начать", for: .normal)
-            stopButton.isHidden = true
-        }
     }
 
     @objc private func startButtonTapped() {
@@ -295,6 +293,7 @@ class MeditateViewController: UIViewController {
             startButton.setTitle("Отменить", for: .normal)
             stopButton.isHidden = false
             stopButton.setTitle("Остановить", for: .normal)
+            lockControls()
         } else {
             timer?.invalidate()
             stopSound()
@@ -302,6 +301,7 @@ class MeditateViewController: UIViewController {
             updateTimerLabel()
             startButton.setTitle("Начать", for: .normal)
             stopButton.isHidden = true
+            unlockControls()
         }
     }
 
@@ -347,6 +347,7 @@ class MeditateViewController: UIViewController {
                 self.startButton.setTitle("Начать", for: .normal)
                 self.stopButton.isHidden = true
                 self.stopSound()
+                self.unlockControls()
             }
         }
     }
@@ -371,9 +372,27 @@ class MeditateViewController: UIViewController {
     }
 
     private func playSound(for sound: Sound) {
-        let fileName = "test_sound"
+        let fileName: String
+        switch sound {
+        case .whiteNoise:       fileName = "white_noise"
+        case .rain:             fileName = "rain"
+        case .sea:              fileName = "sea"
+        case .birds:            fileName = "birds"
+        case .japan:            fileName = "japan"
+        case .train:            fileName = "train"
+        case .airplane:         fileName = "airplane"
+        case .cat:              fileName = "cat"
+        case .loFi:             fileName = "lofi"
+        case .tibetanBowls:     fileName = "tibetan_bowls"
+        case .fireplace:        fileName = "fireplace"
+        case .stream:           fileName = "stream"
+        case .africa:           fileName = "africa"
+        case .zenBells:         fileName = "zen_bells"
+        case .djaz:             fileName = "djaz"
+        }
+
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
-            print("❌ Звук не найден")
+            print("❌ Звук не найден: \(fileName).mp3")
             return
         }
         do {
@@ -382,7 +401,7 @@ class MeditateViewController: UIViewController {
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
         } catch {
-            print("❌ Ошибка воспроизведения звука:", error)
+            print("❌ Ошибка: \(error)")
         }
     }
 
