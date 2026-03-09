@@ -8,6 +8,7 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         view.layer.cornerRadius = 12
         view.layer.borderWidth = 1
         view.layer.borderColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+        view.clipsToBounds = true
         return view
     }()
 
@@ -95,7 +96,15 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.sizeToFit()
         label.isUserInteractionEnabled = true
-        label.center = canvasView.center
+
+        // Place near center of canvas
+        let cx = canvasView.bounds.width / 2
+        let cy = canvasView.bounds.height / 2
+        label.center = CGPoint(
+            x: cx + CGFloat.random(in: -60...60),
+            y: cy + CGFloat.random(in: -60...60)
+        )
+
         addGestures(to: label)
         canvasView.addSubview(label)
     }
@@ -104,20 +113,57 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
     private func addGestures(to view: UIView) {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        pan.require(toFail: doubleTap)
         view.addGestureRecognizer(pan)
         view.addGestureRecognizer(pinch)
+        view.addGestureRecognizer(doubleTap)
     }
 
     @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
         guard let target = gesture.view else { return }
         let translation = gesture.translation(in: canvasView)
-        target.center = CGPoint(x: target.center.x + translation.x, y: target.center.y + translation.y)
+        target.center = CGPoint(
+            x: target.center.x + translation.x,
+            y: target.center.y + translation.y
+        )
         gesture.setTranslation(.zero, in: canvasView)
+
+        if gesture.state == .began {
+            UIView.animate(withDuration: 0.15) {
+                target.transform = target.transform.scaledBy(x: 1.05, y: 1.05)
+            }
+        } else if gesture.state == .ended || gesture.state == .cancelled {
+            UIView.animate(withDuration: 0.15) {
+                // Reset scale component, keep rotation
+                let angle = atan2(target.transform.b, target.transform.a)
+                target.transform = CGAffineTransform(rotationAngle: angle)
+            }
+        }
     }
 
     @objc private func handlePinch(_ gesture: UIPinchGestureRecognizer) {
         guard let target = gesture.view else { return }
         target.transform = target.transform.scaledBy(x: gesture.scale, y: gesture.scale)
         gesture.scale = 1
+    }
+
+    // MARK: - Double tap to rename label
+    @objc private func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        guard let label = gesture.view as? UILabel else { return }
+
+        let alert = UIAlertController(title: "Изменить текст", message: nil, preferredStyle: .alert)
+        alert.addTextField { tf in
+            tf.text = label.text
+            tf.placeholder = "Введите текст"
+        }
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Сохранить", style: .default) { _ in
+            guard let newText = alert.textFields?.first?.text, !newText.isEmpty else { return }
+            label.text = newText
+            label.sizeToFit()
+        })
+        present(alert, animated: true)
     }
 }
