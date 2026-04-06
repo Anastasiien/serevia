@@ -1,13 +1,19 @@
+// ExploreViewController.swift
+// serevia
+//
+// Created by ekatizzz 10.03.2026.
+//
+
 import UIKit
 
 class ExploreViewController: UIViewController {
 
     // MARK: - Constants
-    private let accent   = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
+    private let accent = UIColor(red: 0.58, green: 0.46, blue: 0.42, alpha: 1)
     private let textDark = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
     private let textMid  = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
     private let cardBg   = UIColor.white
-
+    private let bgMain = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1)
     private let scrollView  = UIScrollView()
     private let contentView = UIView()
 
@@ -19,17 +25,27 @@ class ExploreViewController: UIViewController {
         ("Сон и восстановление",  "Здоровье",      "6 мин", "🌙"),
         ("Медитация для начинающих", "Практики",   "8 мин", "🪷")
     ]
+    
+    private let podcasts: [(title: String, author: String, url: String, emoji: String)] = [
+        ("Чай с психологом", "Егор Егоров - психолог, специалист краткосрочной терапии", "https://music.yandex.ru/album/9223243", "☕️"),
+        ("Ты - это важно", "Елена Мицкевич - практикующий психолог и автор блога", "https://music.yandex.ru/album/15666261", "🤎"),
+        ("Развитие осознанности", "Юлия Шешенева - преподаватель студии йоги Retunsky", "https://music.yandex.ru/album/10935950", "🍀"),
+        ("Медитируй со мной", "Авторские практики для расслабления", "https://music.yandex.ru/album/15774913", "🧘‍♂️"),
+        ("Психология", "Александра Яковлева - автор подкаста, психолог, журналист", "https://music.yandex.ru/album/9091989?activeTab=about", "📚")
+    ]
 
     private let tests: [(title: String, desc: String, emoji: String)] = [
-        ("Тест на стресс",     "Оцени уровень тревожности",  "📊"),
-        ("Тест на внимание",   "Проверь концентрацию",       "🎯"),
-        ("Тест на эмоции",     "Узнай своё состояние",       "💭")
+        ("Уровень депрессии", "По шкале Бека (BDI)", "🧠"),
+        ("Уровень тревожности", "По шкале Бека (BAI)",  "👀"),
+        ("Внимательность и осознанность", "По шкале MAAS", "🪷"),
+        ("Психологическое благополучие", "По шкале Риффа (PWB)", "🌱")
     ]
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = AppColors.background
+        view.backgroundColor = bgMain
+        
         setupScrollView()
         buildUI()
     }
@@ -40,6 +56,7 @@ class ExploreViewController: UIViewController {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
         view.addSubview(scrollView)
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -54,7 +71,6 @@ class ExploreViewController: UIViewController {
     }
 
     private func buildUI() {
-        // ── Header ──
         let titleLabel = UILabel()
         titleLabel.text = "Интересное"
         titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
@@ -67,41 +83,42 @@ class ExploreViewController: UIViewController {
         subtitleLabel.textColor = textMid
         subtitleLabel.textAlignment = .center
 
-        // ── Articles section ──
         let articlesHeader = makeSectionHeader("Статьи")
         let articlesScroll = makeArticlesScroll()
+        
+        let podcastsHeader = makeSectionHeader("Рекомендуем послушать")
+        let podcastsScroll = makePodcastsScroll()
 
-        // ── Wish map card ──
         let wishHeader = makeSectionHeader("Карта желаний")
         let wishCard = makeWishMapCard()
 
-        // ── Tests section ──
         let testsHeader = makeSectionHeader("Тесты")
         let testsStack = makeTestsStack()
 
-        // ── Main stack ──
         let mainStack = UIStackView(arrangedSubviews: [
-            titleLabel,
-            subtitleLabel,
-            articlesHeader,
-            articlesScroll,
-            wishHeader,
-            wishCard,
-            testsHeader,
-            testsStack
+            titleLabel, subtitleLabel,
+            articlesHeader, articlesScroll,
+            podcastsHeader, podcastsScroll,
+            wishHeader, wishCard,
+            testsHeader, testsStack
         ])
+        
         mainStack.axis = .vertical
         mainStack.spacing = 0
         mainStack.setCustomSpacing(4,  after: titleLabel)
         mainStack.setCustomSpacing(28, after: subtitleLabel)
         mainStack.setCustomSpacing(14, after: articlesHeader)
         mainStack.setCustomSpacing(28, after: articlesScroll)
+        mainStack.setCustomSpacing(14, after: podcastsHeader)
+        mainStack.setCustomSpacing(28, after: podcastsScroll)
         mainStack.setCustomSpacing(14, after: wishHeader)
         mainStack.setCustomSpacing(28, after: wishCard)
         mainStack.setCustomSpacing(14, after: testsHeader)
+        
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         mainStack.isLayoutMarginsRelativeArrangement = true
         mainStack.layoutMargins = UIEdgeInsets(top: 16, left: 20, bottom: 32, right: 20)
+        
         contentView.addSubview(mainStack)
         NSLayoutConstraint.activate([
             mainStack.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -111,7 +128,6 @@ class ExploreViewController: UIViewController {
         ])
     }
 
-    // MARK: - Section Header
     private func makeSectionHeader(_ text: String) -> UILabel {
         let l = UILabel()
         l.text = text
@@ -120,7 +136,116 @@ class ExploreViewController: UIViewController {
         return l
     }
 
-    // MARK: - Articles Horizontal Scroll
+    // MARK: - Podcasts Logic
+    private func makePodcastsScroll() -> UIScrollView {
+        let scroll = UIScrollView()
+        scroll.showsHorizontalScrollIndicator = false
+        scroll.clipsToBounds = false
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.heightAnchor.constraint(equalToConstant: 110).isActive = true
+
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 12
+        stack.alignment = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        scroll.addSubview(stack)
+        
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: scroll.topAnchor),
+            stack.bottomAnchor.constraint(equalTo: scroll.bottomAnchor),
+            stack.leadingAnchor.constraint(equalTo: scroll.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: scroll.trailingAnchor),
+            stack.heightAnchor.constraint(equalTo: scroll.heightAnchor)
+        ])
+
+        for (i, podcast) in podcasts.enumerated() {
+            stack.addArrangedSubview(makePodcastCard(podcast, index: i))
+        }
+        return scroll
+    }
+    
+    private func makePodcastCard(_ podcast: (title: String, author: String, url: String, emoji: String), index: Int) -> UIView {
+        let card = UIButton(type: .system)
+        card.backgroundColor = cardBg
+        card.layer.cornerRadius = 16
+        card.layer.borderWidth = 1
+        card.layer.borderColor = accent.withAlphaComponent(0.1).cgColor
+        card.clipsToBounds = true
+        card.translatesAutoresizingMaskIntoConstraints = false
+        card.widthAnchor.constraint(equalToConstant: 210).isActive = true
+        card.tag = index
+        card.addTarget(self, action: #selector(podcastTapped(_:)), for: .touchUpInside)
+
+        let backgroundImageView = UIImageView()
+        backgroundImageView.image = UIImage(named: "floral_pattern")
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.alpha = 0.2
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.isUserInteractionEnabled = false
+        backgroundImageView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        
+        card.addSubview(backgroundImageView)
+
+        let emojiCircle = UIView()
+        emojiCircle.backgroundColor = accent.withAlphaComponent(0.08)
+        emojiCircle.layer.cornerRadius = 10
+        emojiCircle.translatesAutoresizingMaskIntoConstraints = false
+        
+        let emojiLabel = UILabel()
+        emojiLabel.text = podcast.emoji
+        emojiLabel.font = .systemFont(ofSize: 16)
+        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let titleLabel = UILabel()
+        titleLabel.text = podcast.title
+        titleLabel.font = .systemFont(ofSize: 13, weight: .bold)
+        titleLabel.textColor = textDark
+        titleLabel.numberOfLines = 0
+        titleLabel.lineBreakMode = .byWordWrapping
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let authorLabel = UILabel()
+        authorLabel.text = podcast.author
+        authorLabel.font = .systemFont(ofSize: 11, weight: .regular)
+        authorLabel.textColor = textMid
+        authorLabel.numberOfLines = 0
+        authorLabel.lineBreakMode = .byWordWrapping
+        authorLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        card.addSubview(emojiCircle)
+        emojiCircle.addSubview(emojiLabel)
+        card.addSubview(titleLabel)
+        card.addSubview(authorLabel)
+
+        NSLayoutConstraint.activate([
+            backgroundImageView.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+            backgroundImageView.centerYAnchor.constraint(equalTo: card.centerYAnchor),
+            backgroundImageView.widthAnchor.constraint(equalTo: card.widthAnchor),
+            backgroundImageView.heightAnchor.constraint(equalTo: card.heightAnchor),
+
+            emojiCircle.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 10),
+            emojiCircle.topAnchor.constraint(equalTo: card.topAnchor, constant: 10),
+            emojiCircle.widthAnchor.constraint(equalToConstant: 34),
+            emojiCircle.heightAnchor.constraint(equalToConstant: 34),
+            
+            emojiLabel.centerXAnchor.constraint(equalTo: emojiCircle.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: emojiCircle.centerYAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: card.topAnchor, constant: 10),
+            titleLabel.leadingAnchor.constraint(equalTo: emojiCircle.trailingAnchor, constant: 10),
+            titleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -10),
+
+            authorLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+            authorLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            authorLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            authorLabel.bottomAnchor.constraint(lessThanOrEqualTo: card.bottomAnchor, constant: -8)
+        ])
+
+        return card
+    }
+
+    // MARK: - Articles Logic
     private func makeArticlesScroll() -> UIScrollView {
         let scroll = UIScrollView()
         scroll.showsHorizontalScrollIndicator = false
@@ -142,20 +267,18 @@ class ExploreViewController: UIViewController {
         ])
 
         for (i, article) in articles.enumerated() {
-            let card = makeArticleCard(article, index: i)
-            stack.addArrangedSubview(card)
+            stack.addArrangedSubview(makeArticleCard(article, index: i))
         }
-
         return scroll
     }
 
     private func makeArticleCard(_ article: (title: String, category: String, time: String, emoji: String), index: Int) -> UIView {
         let pastelBgs: [UIColor] = [
-            UIColor(red: 0.98, green: 0.93, blue: 0.88, alpha: 1),
-            UIColor(red: 0.92, green: 0.95, blue: 0.88, alpha: 1),
-            UIColor(red: 0.88, green: 0.93, blue: 0.98, alpha: 1),
-            UIColor(red: 0.95, green: 0.90, blue: 0.97, alpha: 1),
-            UIColor(red: 0.97, green: 0.95, blue: 0.88, alpha: 1)
+            UIColor(red: 0.98, green: 0.88, blue: 0.78, alpha: 1),
+            UIColor(red: 0.88, green: 0.94, blue: 0.82, alpha: 1),
+            UIColor(red: 0.82, green: 0.90, blue: 0.98, alpha: 1),
+            UIColor(red: 0.92, green: 0.84, blue: 0.96, alpha: 1),
+            UIColor(red: 0.96, green: 0.92, blue: 0.78, alpha: 1)
         ]
 
         let card = UIButton(type: .system)
@@ -179,7 +302,7 @@ class ExploreViewController: UIViewController {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         let metaLabel = UILabel()
-        metaLabel.text = "\(article.category)  ·  \(article.time)"
+        metaLabel.text = "\(article.category) · \(article.time)"
         metaLabel.font = .systemFont(ofSize: 11, weight: .regular)
         metaLabel.textColor = textMid
         metaLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -195,10 +318,8 @@ class ExploreViewController: UIViewController {
             titleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
             metaLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
             metaLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
-            metaLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
             metaLabel.bottomAnchor.constraint(lessThanOrEqualTo: card.bottomAnchor, constant: -14)
         ])
-
         return card
     }
 
@@ -240,6 +361,7 @@ class ExploreViewController: UIViewController {
         card.addSubview(titleLabel)
         card.addSubview(descLabel)
         card.addSubview(button)
+
         NSLayoutConstraint.activate([
             emojiLabel.topAnchor.constraint(equalTo: card.topAnchor, constant: 20),
             emojiLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 20),
@@ -251,19 +373,16 @@ class ExploreViewController: UIViewController {
             button.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 20),
             button.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -20)
         ])
-
         return card
     }
-
-    // MARK: - Tests Stack
+    
+    // MARK: - Tests Logic
     private func makeTestsStack() -> UIStackView {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 10
-
         for (i, test) in tests.enumerated() {
-            let card = makeTestRow(test, index: i)
-            stack.addArrangedSubview(card)
+            stack.addArrangedSubview(makeTestRow(test, index: i))
         }
         return stack
     }
@@ -276,89 +395,120 @@ class ExploreViewController: UIViewController {
         card.layer.shadowOpacity = 0.04
         card.layer.shadowOffset = CGSize(width: 0, height: 2)
         card.layer.shadowRadius = 6
+        
+        card.clipsToBounds = true
+        
         card.translatesAutoresizingMaskIntoConstraints = false
         card.heightAnchor.constraint(equalToConstant: 70).isActive = true
         card.tag = index
         card.addTarget(self, action: #selector(testTapped(_:)), for: .touchUpInside)
 
+        let backgroundImageView = UIImageView()
+        backgroundImageView.image = UIImage(named: "floral_pattern")
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.alpha = 0.2
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.isUserInteractionEnabled = false
+        backgroundImageView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        
+        card.addSubview(backgroundImageView)
+
         let emojiLabel = UILabel()
         emojiLabel.text = test.emoji
         emojiLabel.font = .systemFont(ofSize: 24)
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         let titleLabel = UILabel()
         titleLabel.text = test.title
         titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         titleLabel.textColor = textDark
-        titleLabel.numberOfLines = 1
-        titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.8
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         let descLabel = UILabel()
         descLabel.text = test.desc
         descLabel.font = .systemFont(ofSize: 12, weight: .regular)
         descLabel.textColor = textMid
-        descLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        let chevron = UILabel()
-        chevron.text = "›"
-        chevron.font = .systemFont(ofSize: 22, weight: .light)
-        chevron.textColor = textMid
-        chevron.translatesAutoresizingMaskIntoConstraints = false
 
         let textStack = UIStackView(arrangedSubviews: [titleLabel, descLabel])
         textStack.axis = .vertical
         textStack.spacing = 2
+        textStack.alignment = .leading
         textStack.translatesAutoresizingMaskIntoConstraints = false
 
         card.addSubview(emojiLabel)
         card.addSubview(textStack)
-        card.addSubview(chevron)
+        
         NSLayoutConstraint.activate([
+            backgroundImageView.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+            backgroundImageView.centerYAnchor.constraint(equalTo: card.centerYAnchor),
+            backgroundImageView.widthAnchor.constraint(equalTo: card.widthAnchor),
+            backgroundImageView.heightAnchor.constraint(equalTo: card.heightAnchor),
+
             emojiLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
             emojiLabel.centerYAnchor.constraint(equalTo: card.centerYAnchor),
             textStack.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 14),
             textStack.centerYAnchor.constraint(equalTo: card.centerYAnchor),
-            textStack.trailingAnchor.constraint(equalTo: chevron.leadingAnchor, constant: -12),
-            chevron.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
-            chevron.centerYAnchor.constraint(equalTo: card.centerYAnchor)
+            textStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12)
         ])
-
         return card
     }
 
     // MARK: - Actions
     @objc private func articleTapped(_ sender: UIButton) {
-        let vc = UIViewController()
-        vc.view.backgroundColor = AppColors.background
-        let l = UILabel()
-        l.text = articles[sender.tag].title
-        l.font = .systemFont(ofSize: 20, weight: .bold)
-        l.textColor = textDark
-        l.translatesAutoresizingMaskIntoConstraints = false
-        vc.view.addSubview(l)
-        NSLayoutConstraint.activate([
-            l.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
-            l.topAnchor.constraint(equalTo: vc.view.safeAreaLayoutGuide.topAnchor, constant: 30)
-        ])
-        navigationController?.pushViewController(vc, animated: true)
+        let title = articles[sender.tag].title
+        let detailVC = ArticleDetailViewController()
+        detailVC.articleTitle = title
+        detailVC.contentText = ArticleProvider.getContent(for: title)
+        detailVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    @objc private func podcastTapped(_ sender: UIButton) {
+        let podcastUrl = podcasts[sender.tag].url
+        if let url = URL(string: podcastUrl) {
+            UIApplication.shared.open(url)
+        }
     }
 
     @objc private func testTapped(_ sender: UIButton) {
-        let vc = UIViewController()
-        vc.view.backgroundColor = AppColors.background
-        let l = UILabel()
-        l.text = tests[sender.tag].title
-        l.font = .systemFont(ofSize: 20, weight: .bold)
-        l.textColor = textDark
-        l.translatesAutoresizingMaskIntoConstraints = false
-        vc.view.addSubview(l)
-        NSLayoutConstraint.activate([
-            l.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
-            l.topAnchor.constraint(equalTo: vc.view.safeAreaLayoutGuide.topAnchor, constant: 30)
-        ])
-        navigationController?.pushViewController(vc, animated: true)
+        let title = tests[sender.tag].title
+        
+        switch title {
+        case "Уровень депрессии":
+            let vc = BeckTestViewController()
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+            
+        case "Уровень тревожности":
+            let vc = BeckAnxietyTestViewController()
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        
+        case "Внимательность и осознанность":
+            let vc = MindfulnessTestViewController()
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+            
+        case "Психологическое благополучие":
+                let vc = WellBeingTestViewController()
+                vc.hidesBottomBarWhenPushed = true
+                navigationController?.pushViewController(vc, animated: true)
+            
+        default:
+            // Заглушка для остальных тестов
+            let vc = UIViewController()
+            vc.view.backgroundColor = AppColors.background
+            let l = UILabel()
+            l.text = title
+            l.font = .systemFont(ofSize: 20, weight: .bold)
+            l.textColor = textDark
+            l.translatesAutoresizingMaskIntoConstraints = false
+            vc.view.addSubview(l)
+            NSLayoutConstraint.activate([
+                l.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
+                l.topAnchor.constraint(equalTo: vc.view.safeAreaLayoutGuide.topAnchor, constant: 30)
+            ])
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
 
     @objc private func openWishMap() {
