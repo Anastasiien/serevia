@@ -9,11 +9,12 @@ struct Habit: Codable {
 class HomeViewController: UIViewController {
 
     // MARK: - Constants
-    private let accent    = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-    private let textDark  = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
-    private let textMid   = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
-    private let cardBg    = UIColor.white
-
+    private let accent    = AppColors.primary
+    private let textDark  = AppColors.text
+    private let textMid   = AppColors.lightText
+    private let cardBg    = AppColors.card
+    private let pageBg    = AppColors.background
+    
     // MARK: - Phrase
     private let typingLabel = UILabel()
     private var currentPhraseIndex = 0
@@ -129,95 +130,162 @@ class HomeViewController: UIViewController {
         let attributed = NSMutableAttributedString(string: "SEREVIA")
         attributed.addAttribute(.kern, value: 8, range: NSRange(location: 0, length: attributed.length))
         logoLabel.attributedText = attributed
-        logoLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        logoLabel.font = .systemFont(ofSize: 32, weight: .bold)
         logoLabel.textColor = textDark
         logoLabel.textAlignment = .center
 
         // ── Greeting ──
         let greetingLabel = UILabel()
         greetingLabel.text = "Привет, Анастасия"
-        greetingLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        greetingLabel.font = .systemFont(ofSize: 20, weight: .regular)
         greetingLabel.textColor = textMid
         greetingLabel.textAlignment = .center
 
         // ── Quote card ──
         let quoteCard = makeCard()
+        quoteCard.clipsToBounds = true
+
+        let flowerBackground = UIImageView()
+        flowerBackground.image = UIImage(named: "floral_pattern")
+        flowerBackground.contentMode = .scaleAspectFill
+        flowerBackground.alpha = 0.2
+        flowerBackground.translatesAutoresizingMaskIntoConstraints = false
+        quoteCard.addSubview(flowerBackground)
 
         typingLabel.text = phrases.first
-        typingLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        typingLabel.font = .systemFont(ofSize: 18, weight: .medium).italic()
         typingLabel.textColor = textDark
-        typingLabel.textAlignment = .center
         typingLabel.numberOfLines = 0
+        typingLabel.textAlignment = .left
 
         let morePhraseButton = UIButton(type: .system)
-        morePhraseButton.setTitle("⟳  Ещё фраза", for: .normal)
-        morePhraseButton.setTitleColor(textMid, for: .normal)
-        morePhraseButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        morePhraseButton.backgroundColor = UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
-        morePhraseButton.layer.cornerRadius = 16
-        morePhraseButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 28, bottom: 10, right: 28)
+        let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+        let refreshImage = UIImage(systemName: "arrow.clockwise", withConfiguration: config)
+        morePhraseButton.setImage(refreshImage, for: .normal)
+                
+        morePhraseButton.tintColor = textMid
+        morePhraseButton.backgroundColor = accent.withAlphaComponent(0.12)
+                
+        morePhraseButton.layer.cornerRadius = 14
+        morePhraseButton.translatesAutoresizingMaskIntoConstraints = false
         morePhraseButton.addTarget(self, action: #selector(nextPhrase), for: .touchUpInside)
 
-        let quoteStack = UIStackView(arrangedSubviews: [typingLabel, morePhraseButton])
-        quoteStack.axis = .vertical
-        quoteStack.alignment = .center
-        quoteStack.spacing = 14
-        quoteStack.translatesAutoresizingMaskIntoConstraints = false
-        quoteCard.addSubview(quoteStack)
-        NSLayoutConstraint.activate([
-            quoteStack.topAnchor.constraint(equalTo: quoteCard.topAnchor, constant: 20),
-            quoteStack.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor, constant: 20),
-            quoteStack.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor, constant: -20),
-            quoteStack.bottomAnchor.constraint(equalTo: quoteCard.bottomAnchor, constant: -20)
-        ])
+        let horizontalStack = UIStackView(arrangedSubviews: [typingLabel, morePhraseButton])
+        horizontalStack.axis = .horizontal
+        horizontalStack.spacing = 12
+        horizontalStack.alignment = .center
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
 
+        quoteCard.addSubview(horizontalStack)
+
+        NSLayoutConstraint.activate([
+            flowerBackground.topAnchor.constraint(equalTo: quoteCard.topAnchor),
+            flowerBackground.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor),
+            flowerBackground.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor),
+            flowerBackground.bottomAnchor.constraint(equalTo: quoteCard.bottomAnchor),
+
+            quoteCard.heightAnchor.constraint(equalToConstant: 80),
+
+            morePhraseButton.widthAnchor.constraint(equalToConstant: 42),
+            morePhraseButton.heightAnchor.constraint(equalToConstant: 42),
+
+            horizontalStack.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor, constant: 20),
+            horizontalStack.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor, constant: -16),
+            horizontalStack.centerYAnchor.constraint(equalTo: quoteCard.centerYAnchor)
+        ])
+        
         // ── Habits mini card ──
         let habitsCard = makeCard()
-        let habitsTitle = makeSmallLabel("Привычки")
+        habitsCard.clipsToBounds = true
+        habitsCard.heightAnchor.constraint(equalToConstant: 110).isActive = true
 
-        habitsProgress.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        let habitsPattern = UIImageView()
+        habitsPattern.image = UIImage(named: "floral_pattern")
+        habitsPattern.contentMode = .scaleAspectFill
+        habitsPattern.alpha = 0.2
+        habitsPattern.translatesAutoresizingMaskIntoConstraints = false
+        habitsPattern.transform = CGAffineTransform(scaleX: 1.6, y: 1.6)
+        habitsCard.addSubview(habitsPattern)
+
+        let habitsTitle = makeSmallLabel("Привычки")
+        habitsTitle.textAlignment = .center
+                
+        habitsProgress.font = UIFont.systemFont(ofSize: 30, weight: .bold)
         habitsProgress.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-        updateHabitsProgress()
+        habitsProgress.textAlignment = .center
 
         let habitsSubtitle = makeSmallLabel("Сегодня")
+        habitsSubtitle.textAlignment = .center
+        habitsSubtitle.translatesAutoresizingMaskIntoConstraints = false
 
         let habitsInnerStack = UIStackView(arrangedSubviews: [habitsTitle, habitsProgress])
         habitsInnerStack.axis = .vertical
-        habitsInnerStack.distribution = .equalSpacing
+        habitsInnerStack.spacing = 2
+        habitsInnerStack.alignment = .center
         habitsInnerStack.translatesAutoresizingMaskIntoConstraints = false
+
         habitsCard.addSubview(habitsInnerStack)
         habitsCard.addSubview(habitsSubtitle)
-        habitsSubtitle.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
-            habitsInnerStack.topAnchor.constraint(equalTo: habitsCard.topAnchor, constant: 16),
+            habitsPattern.topAnchor.constraint(equalTo: habitsCard.topAnchor),
+            habitsPattern.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor),
+            habitsPattern.trailingAnchor.constraint(equalTo: habitsCard.trailingAnchor),
+            habitsPattern.bottomAnchor.constraint(equalTo: habitsCard.bottomAnchor),
+
+            habitsInnerStack.topAnchor.constraint(equalTo: habitsCard.topAnchor, constant: 14),
             habitsInnerStack.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
             habitsInnerStack.trailingAnchor.constraint(equalTo: habitsCard.trailingAnchor, constant: -16),
-            habitsSubtitle.topAnchor.constraint(equalTo: habitsInnerStack.bottomAnchor, constant: 8),
-            habitsSubtitle.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
-            habitsSubtitle.bottomAnchor.constraint(equalTo: habitsCard.bottomAnchor, constant: -12)
+            
+            habitsSubtitle.centerXAnchor.constraint(equalTo: habitsCard.centerXAnchor),
+            habitsSubtitle.bottomAnchor.constraint(equalTo: habitsCard.bottomAnchor, constant: -14)
         ])
 
         // ── Streak card ──
         let streakCard = makeCard()
-        let streakTitle = makeSmallLabel("Дней подряд")
+        streakCard.clipsToBounds = true
 
-        streakNumber.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        let streakPattern = UIImageView()
+        streakPattern.image = UIImage(named: "floral_pattern")
+        streakPattern.contentMode = .scaleAspectFill
+        streakPattern.alpha = 0.2
+        streakPattern.translatesAutoresizingMaskIntoConstraints = false
+        streakPattern.transform = CGAffineTransform(scaleX: 1.6, y: 1.6)
+        streakCard.addSubview(streakPattern)
+
+        let streakTitle = makeSmallLabel("Дней подряд")
+        streakTitle.textAlignment = .center
+
+        streakNumber.font = UIFont.systemFont(ofSize: 30, weight: .bold)
         streakNumber.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
+        streakNumber.textAlignment = .center
 
         topLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         topLabel.textColor = UIColor(red: 0.56, green: 0.47, blue: 0.38, alpha: 1)
+        topLabel.textAlignment = .center
+        topLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        let streakInnerStack = UIStackView(arrangedSubviews: [streakTitle, streakNumber, topLabel])
+        let streakInnerStack = UIStackView(arrangedSubviews: [streakTitle, streakNumber])
         streakInnerStack.axis = .vertical
+        streakInnerStack.spacing = 2
         streakInnerStack.alignment = .center
-        streakInnerStack.spacing = 6
         streakInnerStack.translatesAutoresizingMaskIntoConstraints = false
+
         streakCard.addSubview(streakInnerStack)
+        streakCard.addSubview(topLabel)
+
         NSLayoutConstraint.activate([
-            streakInnerStack.topAnchor.constraint(equalTo: streakCard.topAnchor, constant: 16),
+            streakPattern.topAnchor.constraint(equalTo: streakCard.topAnchor),
+            streakPattern.leadingAnchor.constraint(equalTo: streakCard.leadingAnchor),
+            streakPattern.trailingAnchor.constraint(equalTo: streakCard.trailingAnchor),
+            streakPattern.bottomAnchor.constraint(equalTo: streakCard.bottomAnchor),
+
+            streakInnerStack.topAnchor.constraint(equalTo: streakCard.topAnchor, constant: 14),
             streakInnerStack.leadingAnchor.constraint(equalTo: streakCard.leadingAnchor, constant: 16),
             streakInnerStack.trailingAnchor.constraint(equalTo: streakCard.trailingAnchor, constant: -16),
-            streakInnerStack.bottomAnchor.constraint(equalTo: streakCard.bottomAnchor, constant: -12)
+                    
+            topLabel.centerXAnchor.constraint(equalTo: streakCard.centerXAnchor),
+            topLabel.bottomAnchor.constraint(equalTo: streakCard.bottomAnchor, constant: -14)
         ])
 
         let statsRow = UIStackView(arrangedSubviews: [habitsCard, streakCard])
@@ -292,7 +360,36 @@ class HomeViewController: UIViewController {
         habitsContainerCard.layer.shadowOpacity = 0.04
         habitsContainerCard.layer.shadowOffset = CGSize(width: 0, height: 2)
         habitsContainerCard.layer.shadowRadius = 6
+        habitsContainerCard.clipsToBounds = true
         habitsContainerCard.translatesAutoresizingMaskIntoConstraints = false
+
+        if let originalImage = UIImage(named: "floral_pattern") {
+            let newSize = CGSize(width: originalImage.size.width / 2.5,
+                                height: originalImage.size.height / 2.5)
+            UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+            originalImage.draw(in: CGRect(origin: .zero, size: newSize))
+            let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            if let smallerImage = scaledImage {
+                habitsContainerCard.backgroundColor = UIColor(patternImage: smallerImage)
+            } else {
+                habitsContainerCard.backgroundColor = UIColor(patternImage: originalImage)
+            }
+        }
+        
+        let overlayView = UIView()
+        overlayView.backgroundColor = cardBg
+        overlayView.alpha = 0.8
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        habitsContainerCard.addSubview(overlayView)
+        
+        NSLayoutConstraint.activate([
+            overlayView.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor),
+            overlayView.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: habitsContainerCard.trailingAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: habitsContainerCard.bottomAnchor)
+        ])
 
         let titleLabel = UILabel()
         titleLabel.text = "Мои привычки"
@@ -317,6 +414,7 @@ class HomeViewController: UIViewController {
         containerStack.spacing = 12
         containerStack.translatesAutoresizingMaskIntoConstraints = false
         habitsContainerCard.addSubview(containerStack)
+        
         NSLayoutConstraint.activate([
             containerStack.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor, constant: 20),
             containerStack.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor, constant: 20),
@@ -332,7 +430,6 @@ class HomeViewController: UIViewController {
             let row = UIView()
             row.translatesAutoresizingMaskIntoConstraints = false
 
-            // Circle / check indicator
             let indicator = UIView()
             indicator.layer.cornerRadius = 11
             indicator.layer.borderWidth = 1.5
@@ -341,7 +438,6 @@ class HomeViewController: UIViewController {
             if habit.isCompleted {
                 indicator.backgroundColor = accent
                 indicator.layer.borderColor = accent.cgColor
-                // Checkmark
                 let check = UILabel()
                 check.text = "✓"
                 check.font = .systemFont(ofSize: 11, weight: .bold)
@@ -395,7 +491,6 @@ class HomeViewController: UIViewController {
 
             habitStack.addArrangedSubview(row)
 
-            // Subtle divider (not after last)
             if index < habits.count - 1 {
                 let divider = UIView()
                 divider.backgroundColor = UIColor(red: 0.90, green: 0.87, blue: 0.82, alpha: 1)
@@ -474,5 +569,16 @@ class HomeViewController: UIViewController {
            let saved = try? JSONDecoder().decode([Habit].self, from: data) {
             habits = saved
         }
+    }
+}
+
+extension UIFont {
+    func italic() -> UIFont {
+        return self.withTraits(traits: .traitItalic)
+    }
+
+    func withTraits(traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
+        let descriptor = fontDescriptor.withSymbolicTraits(traits)
+        return UIFont(descriptor: descriptor!, size: 0)
     }
 }

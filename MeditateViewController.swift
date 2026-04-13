@@ -51,8 +51,8 @@ class MeditateViewController: UIViewController {
     private var timerCard: UIView!
     private var selectedSound: Sound = .rain
     private var timerLabel = UILabel()
-    private var durationSlider = UISlider()      // ← для блокировки слайдера
-    private var soundScrollView = UIScrollView() // ← для блокировки сетки звуков
+    private var durationSlider = UISlider()
+    private var soundScrollView = UIScrollView()
     private var categoriesScrollView: UIScrollView!
     private var categoriesStack: UIStackView!
     private let categories = ["Все", "Избранное", "Сон", "Расслабление", "Фокус"]
@@ -90,13 +90,13 @@ class MeditateViewController: UIViewController {
         titleLabel.text = "Медитация"
         titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
         titleLabel.textAlignment = .center
-        titleLabel.textColor = UIColor(red: 0.22, green: 0.16, blue: 0.10, alpha: 1)
+        titleLabel.textColor = AppColors.text
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Найдите внутренний покой"
         subtitleLabel.font = .systemFont(ofSize: 15, weight: .regular)
         subtitleLabel.textAlignment = .center
-        subtitleLabel.textColor = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
+        subtitleLabel.textColor = AppColors.lightText
 
         let headerStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         headerStack.axis = .vertical
@@ -118,7 +118,6 @@ class MeditateViewController: UIViewController {
             timerContentStack.bottomAnchor.constraint(equalTo: timerCard.bottomAnchor, constant: -22)
         ])
 
-        // Время — заголовок + метка в одну строку
         let timerHeaderStack = UIStackView()
         timerHeaderStack.axis = .horizontal
         timerHeaderStack.distribution = .equalSpacing
@@ -127,7 +126,7 @@ class MeditateViewController: UIViewController {
         let timerTitle = UILabel()
         timerTitle.text = "Время сеанса"
         timerTitle.font = .systemFont(ofSize: 13, weight: .medium)
-        timerTitle.textColor = UIColor(red: 0.50, green: 0.42, blue: 0.33, alpha: 1)
+        timerTitle.textColor = AppColors.lightText
         timerTitle.textAlignment = .left
 
         timerLabel.text = "\(selectedTime) мин"
@@ -135,34 +134,30 @@ class MeditateViewController: UIViewController {
         timerLabel.adjustsFontSizeToFitWidth = true
         timerLabel.minimumScaleFactor = 0.7
         timerLabel.textAlignment = .right
-        timerLabel.textColor = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
+        timerLabel.textColor = AppColors.text
 
         timerHeaderStack.addArrangedSubview(timerTitle)
         timerHeaderStack.addArrangedSubview(timerLabel)
         timerContentStack.addArrangedSubview(timerHeaderStack)
 
-        // Слайдер
         durationSlider.minimumValue = 1
         durationSlider.maximumValue = 120
         durationSlider.value = Float(selectedTime)
-        durationSlider.tintColor = UIColor(red: 0.53, green: 0.43, blue: 0.34, alpha: 1)
+        durationSlider.tintColor = AppColors.primary
         durationSlider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
         timerContentStack.addArrangedSubview(durationSlider)
 
-        // Разделитель
         let divider = UIView()
-        divider.backgroundColor = UIColor(red: 0.88, green: 0.83, blue: 0.77, alpha: 1)
+        divider.backgroundColor = AppColors.border
         divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
         timerContentStack.addArrangedSubview(divider)
 
-        // Мелодия заголовок
         let soundTitle = UILabel()
         soundTitle.text = "Мелодия"
         soundTitle.font = .systemFont(ofSize: 13, weight: .medium)
-        soundTitle.textColor = UIColor(red: 0.50, green: 0.42, blue: 0.33, alpha: 1)
+        soundTitle.textColor = AppColors.lightText
         timerContentStack.addArrangedSubview(soundTitle)
 
-        // soundScrollView — свойство класса
         soundScrollView.showsVerticalScrollIndicator = false
         soundScrollView.translatesAutoresizingMaskIntoConstraints = false
         timerContentStack.addArrangedSubview(soundScrollView)
@@ -207,34 +202,28 @@ class MeditateViewController: UIViewController {
             button.titleLabel?.font = .systemFont(ofSize: 12, weight: .medium)
             button.layer.cornerRadius = 18
             button.layer.borderWidth = isSelected ? 0 : 1
-            button.layer.borderColor = UIColor(red: 0.88, green: 0.84, blue: 0.79, alpha: 1).cgColor
+            button.layer.borderColor = AppColors.border.cgColor
             button.backgroundColor = isSelected
-                ? UIColor(red: 0.45, green: 0.35, blue: 0.25, alpha: 1)
-                : UIColor(red: 0.97, green: 0.95, blue: 0.91, alpha: 1)
-            button.setTitleColor(isSelected ? .white : UIColor(red: 0.28, green: 0.22, blue: 0.15, alpha: 1), for: .normal)
+                ? AppColors.primary
+                : AppColors.background
+            button.setTitleColor(isSelected ? .white : AppColors.text, for: .normal)
             button.heightAnchor.constraint(equalToConstant: buttonHeight).isActive = true
             button.addTarget(self, action: #selector(soundSelected(_:)), for: .touchUpInside)
             currentRowStack?.addArrangedSubview(button)
         }
 
-        // Кнопка Начать
         startButton.setTitle("Начать", for: .normal)
         startButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        startButton.backgroundColor = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
+        startButton.backgroundColor = AppColors.primary
         startButton.setTitleColor(.white, for: .normal)
         startButton.layer.cornerRadius = 16
-        startButton.layer.shadowColor = UIColor.clear.cgColor
-        startButton.layer.shadowOpacity = 0
-        startButton.layer.shadowOffset = .zero
-        startButton.layer.shadowRadius = 0
         startButton.heightAnchor.constraint(equalToConstant: 54).isActive = true
         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
         timerContentStack.addArrangedSubview(startButton)
 
-        // Кнопка Остановить
         stopButton.setTitle("⏸  Остановить", for: .normal)
         stopButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        stopButton.setTitleColor(UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1), for: .normal)
+        stopButton.setTitleColor(AppColors.primary, for: .normal)
         stopButton.isHidden = true
         stopButton.addTarget(self, action: #selector(stopButtonTapped), for: .touchUpInside)
         timerContentStack.addArrangedSubview(stopButton)
@@ -259,11 +248,10 @@ class MeditateViewController: UIViewController {
         ])
         setupCategoryButtons()
 
-        // Заголовок для медитаций
         let meditationsTitle = UILabel()
         meditationsTitle.text = "Практики"
         meditationsTitle.font = .systemFont(ofSize: 18, weight: .bold)
-        meditationsTitle.textColor = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
+        meditationsTitle.textColor = AppColors.text
 
         meditationsStack.axis = .vertical
         meditationsStack.spacing = 10
@@ -304,7 +292,6 @@ class MeditateViewController: UIViewController {
         ])
     }
 
-    // MARK: - Блокировка / разблокировка слайдера и сетки звуков
     private func lockControls() {
         durationSlider.isUserInteractionEnabled = false
         durationSlider.alpha = 0.4
@@ -322,17 +309,15 @@ class MeditateViewController: UIViewController {
     // MARK: - Timer Actions
     @objc private func sliderChanged(_ sender: UISlider) {
         selectedTime = Int(sender.value)
-        timerLabel.text = "⏱ \(selectedTime) мин"
+        timerLabel.text = "\(selectedTime) мин"
     }
 
     @objc private func startButtonTapped() {
         if startButton.title(for: .normal) == "Начать" {
-            // Если remainingSeconds > 0 — значит была пауза через "Остановить", продолжаем
             if remainingSeconds > 0 {
                 startTimerResume()
                 playSound(for: selectedSound)
             } else {
-                // Свежий старт
                 startMeditation()
             }
             startButton.setTitle("Отменить", for: .normal)
@@ -340,13 +325,12 @@ class MeditateViewController: UIViewController {
             stopButton.setTitle("Остановить", for: .normal)
             lockControls()
         } else {
-            // Отменить — полный сброс
             timer?.invalidate()
             stopSound()
             remainingSeconds = 0
             selectedTime = 1
             durationSlider.value = 1
-            timerLabel.text = "⏱ 1 мин"
+            timerLabel.text = "1 мин"
             startButton.setTitle("Начать", for: .normal)
             stopButton.isHidden = true
             unlockControls()
@@ -362,22 +346,19 @@ class MeditateViewController: UIViewController {
             for view in rowStack.arrangedSubviews {
                 guard let button = view as? UIButton else { continue }
                 let isSelected = button.tag == sender.tag
-                button.backgroundColor = isSelected
-                    ? UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-                    : UIColor(red: 0.97, green: 0.95, blue: 0.91, alpha: 1)
-                button.setTitleColor(isSelected ? .white : .darkText, for: .normal)
+                button.backgroundColor = isSelected ? AppColors.primary : AppColors.background
+                button.setTitleColor(isSelected ? .white : AppColors.text, for: .normal)
+                button.layer.borderWidth = isSelected ? 0 : 1
             }
         }
     }
 
     @objc private func stopButtonTapped() {
         if stopButton.title(for: .normal) == "Остановить" {
-            // Пауза — ставим на паузу, не пересоздаём
             timer?.invalidate()
             audioPlayer?.pause()
             stopButton.setTitle("Продолжить", for: .normal)
         } else {
-            // Продолжить — возобновляем с того же места
             startTimerResume()
             audioPlayer?.play()
             stopButton.setTitle("Остановить", for: .normal)
@@ -441,10 +422,7 @@ class MeditateViewController: UIViewController {
         case .djaz:             fileName = "djaz"
         }
 
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
-            print("❌ Звук не найден: \(fileName).mp3")
-            return
-        }
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else { return }
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.numberOfLoops = -1
@@ -457,12 +435,12 @@ class MeditateViewController: UIViewController {
 
     private func createCardView() -> UIView {
         let card = UIView()
-        card.backgroundColor = UIColor(red: 1.0, green: 0.995, blue: 0.99, alpha: 1.0)
+        card.backgroundColor = AppColors.card
         card.layer.cornerRadius = 22
-        card.layer.shadowColor = UIColor.black.cgColor
+        card.layer.shadowColor = AppColors.text.cgColor
         card.layer.shadowOpacity = 0.04
-        card.layer.shadowOffset = CGSize(width: 0, height: 2)
-        card.layer.shadowRadius = 6
+        card.layer.shadowOffset = CGSize(width: 0, height: 4)
+        card.layer.shadowRadius = 8
         return card
     }
 
@@ -473,18 +451,11 @@ class MeditateViewController: UIViewController {
             let isActive = cat == selectedCategory
             let button = UIButton(type: .system)
             button.setTitle(cat, for: .normal)
-            button.setTitleColor(
-                isActive ? .white : UIColor(red: 0.42, green: 0.33, blue: 0.25, alpha: 1),
-                for: .normal
-            )
-            button.backgroundColor = isActive
-                ? UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-                : UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
+            button.setTitleColor(isActive ? .white : AppColors.text, for: .normal)
+            button.backgroundColor = isActive ? AppColors.primary : AppColors.sectionBackground
             button.layer.cornerRadius = 14
-            button.layer.borderWidth = 1
-            button.layer.borderColor = isActive
-                ? UIColor.clear.cgColor
-                : UIColor(red: 0.84, green: 0.79, blue: 0.73, alpha: 1).cgColor
+            button.layer.borderWidth = isActive ? 0 : 1
+            button.layer.borderColor = AppColors.border.cgColor
             button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
             button.heightAnchor.constraint(equalToConstant: 36).isActive = true
             button.widthAnchor.constraint(greaterThanOrEqualToConstant: 82).isActive = true
@@ -500,7 +471,7 @@ class MeditateViewController: UIViewController {
         updateMeditations()
     }
 
-    // MARK: - Meditations
+    // MARK: - Meditations Logic (Timers & Handlers)
     private func handleMeditationPlay(
         meditation: (name: String, duration: Int),
         playButton: UIButton,
@@ -545,7 +516,7 @@ class MeditateViewController: UIViewController {
                 self.activeMeditationTimer = nil
                 playButton.setTitle("▶️", for: .normal)
                 cancelButton.isHidden = true
-                durationLabel.text = "✅ Сеанс завершен"
+                durationLabel.text = "✅ Завершено"
             }
         }
     }
@@ -583,35 +554,31 @@ class MeditateViewController: UIViewController {
 
         for meditation in items {
             let card = createCardView()
-
             let isFav = favorites.contains(meditation.name)
 
             let favButton = UIButton(type: .system)
             favButton.setTitle(isFav ? "❤️" : "🤍", for: .normal)
-            favButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
             favButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
 
             let playButton = UIButton(type: .system)
             playButton.setTitle("▶️", for: .normal)
-            playButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
             playButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
 
             let cancelButton = UIButton(type: .system)
             cancelButton.setTitle("❌", for: .normal)
-            cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
             cancelButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
             cancelButton.isHidden = true
 
             let title = UILabel()
             title.text = meditation.name
             title.font = .systemFont(ofSize: 15, weight: .semibold)
-            title.textColor = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
+            title.textColor = AppColors.text
             title.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
             let durationLabel = UILabel()
             durationLabel.text = "\(meditation.duration) мин"
             durationLabel.font = .systemFont(ofSize: 13, weight: .medium)
-            durationLabel.textColor = UIColor(red: 0.50, green: 0.42, blue: 0.33, alpha: 1)
+            durationLabel.textColor = AppColors.lightText
             durationLabel.setContentHuggingPriority(.required, for: .horizontal)
 
             favButton.addAction(UIAction(handler: { [weak self] _ in
@@ -643,7 +610,6 @@ class MeditateViewController: UIViewController {
             stack.axis = .horizontal
             stack.alignment = .center
             stack.spacing = 10
-            stack.distribution = .fill
             stack.translatesAutoresizingMaskIntoConstraints = false
 
             card.addSubview(stack)

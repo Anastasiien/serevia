@@ -3,12 +3,13 @@ import UIKit
 class JournalViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIColorPickerViewControllerDelegate {
 
     // MARK: - Constants
-    private let accent     = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-    private let cardBg     = UIColor.white
-    private let pageBg     = AppColors.background
+    private let accent     = UIColor(red: 0.58, green: 0.46, blue: 0.42, alpha: 1)
+    private let pageBg     = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1)
     private let textDark   = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
     private let textMid    = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
-    private let tagInactive = UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
+        
+    private let cardBg      = UIColor.white
+    private let tagInactive = UIColor(red: 0.88, green: 0.85, blue: 0.81, alpha: 1.0)
     private let tagBorder   = UIColor(red: 0.84, green: 0.79, blue: 0.73, alpha: 1)
 
     // MARK: - Data
@@ -78,7 +79,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         let tv = UITextView()
         tv.font = .systemFont(ofSize: 15)
         tv.textColor = textDark
-        tv.backgroundColor = UIColor(red: 0.95, green: 0.91, blue: 0.85, alpha: 1)
+        tv.backgroundColor = UIColor(red: 0.92, green: 0.90, blue: 0.87, alpha: 1.0)
         tv.layer.cornerRadius = 14
         tv.layer.borderWidth = 1.5
         tv.layer.borderColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 1).cgColor
@@ -293,7 +294,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         // ── Photo card ──
         // Dashed drop zone inside photo card
         let dropZone = UIView()
-        dropZone.backgroundColor = UIColor(red: 0.94, green: 0.90, blue: 0.84, alpha: 1)
+        dropZone.backgroundColor = UIColor(red: 0.92, green: 0.90, blue: 0.87, alpha: 1.0)
         dropZone.layer.cornerRadius = 16
         photoCard.addSubview(dropZone)
         dropZone.translatesAutoresizingMaskIntoConstraints = false

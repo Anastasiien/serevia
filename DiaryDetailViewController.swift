@@ -42,7 +42,7 @@ class DiaryDetailViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0.95, green: 0.93, blue: 0.88, alpha: 1.0)
+        view.backgroundColor = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1.0)
 
         // MARK: - ScrollView
         let scrollView = UIScrollView()
@@ -96,7 +96,7 @@ class DiaryDetailViewController: UIViewController {
         let colorView = UIView()
         colorView.layer.cornerRadius = 16
         colorView.layer.borderWidth = 1
-        colorView.layer.borderColor = UIColor(white: 0.8, alpha: 1).cgColor
+        colorView.layer.borderColor = AppColors.border.cgColor
         colorView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             colorView.widthAnchor.constraint(equalToConstant: 32),
@@ -113,12 +113,12 @@ class DiaryDetailViewController: UIViewController {
         let colorTextLabel = UILabel()
         colorTextLabel.text = "Цвет:"
         colorTextLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        colorTextLabel.textColor = UIColor(red: 0.67, green: 0.55, blue: 0.42, alpha: 1.0)
+        colorTextLabel.textColor = AppColors.lightText
 
         let emotionTextLabel = UILabel()
         emotionTextLabel.text = "Эмоция:"
         emotionTextLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        emotionTextLabel.textColor = UIColor(red: 0.67, green: 0.55, blue: 0.42, alpha: 1.0)
+        emotionTextLabel.textColor = AppColors.lightText
 
         let emotionStack = UIStackView(arrangedSubviews: [
             colorTextLabel, colorView,
@@ -132,7 +132,7 @@ class DiaryDetailViewController: UIViewController {
         infoCard.axis = .vertical
         infoCard.spacing = 12
         infoCard.alignment = .center
-        infoCard.backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
+        infoCard.backgroundColor = AppColors.card
         infoCard.layer.cornerRadius = 16
         infoCard.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         infoCard.isLayoutMarginsRelativeArrangement = true
@@ -161,12 +161,12 @@ class DiaryDetailViewController: UIViewController {
                 let label = UILabel()
                 label.text = "#\(tag)"
                 label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-                label.textColor = UIColor(red: 0.45, green: 0.36, blue: 0.28, alpha: 1.0)
+                label.textColor = AppColors.primary
                 label.textAlignment = .center
                 label.isUserInteractionEnabled = false
 
                 let container = UIView()
-                container.backgroundColor = UIColor(red: 0.93, green: 0.89, blue: 0.82, alpha: 1.0)
+                container.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.81, alpha: 1.0)
                 container.layer.cornerRadius = 14
                 container.clipsToBounds = true
                 container.addSubview(label)
@@ -193,11 +193,8 @@ class DiaryDetailViewController: UIViewController {
 
             mainStack.addArrangedSubview(imageView)
 
-            // Ограничиваем максимальную высоту
             imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 300).isActive = true
         }
-
-
 
         // MARK: - Текст
         if !entry.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -208,7 +205,7 @@ class DiaryDetailViewController: UIViewController {
             textLabel.text = entry.text
 
             let textContainer = UIView()
-            textContainer.backgroundColor = UIColor(red: 0.90, green: 0.85, blue: 0.78, alpha: 1.0)
+            textContainer.backgroundColor = UIColor(red: 0.92, green: 0.90, blue: 0.87, alpha: 1.0)
             textContainer.layer.cornerRadius = 12
             textContainer.addSubview(textLabel)
 
@@ -225,3 +222,4 @@ class DiaryDetailViewController: UIViewController {
     }
 
 }
+
