@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 
 class WishMapEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
 
@@ -14,6 +15,7 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
     private let addImageButton = UIButton(type: .system)
     private let addTextButton = UIButton(type: .system)
     private let clearButton = UIButton(type: .system)
+    private let saveButton = UIButton(type: .system)
     
     private let toolsPanel = UIView()
     private let toolsStack = UIStackView()
@@ -38,11 +40,18 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
     // MARK: - Layout
     private func setupCanvas() {
         clearButton.setTitle("Очистить", for: .normal)
-        clearButton.setTitleColor(AppColors.primary, for: .normal)
+        clearButton.setTitleColor(.systemRed, for: .normal)
         clearButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         clearButton.addTarget(self, action: #selector(clearCanvas), for: .touchUpInside)
         clearButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(clearButton)
+        
+        saveButton.setTitle("Сохранить", for: .normal)
+        saveButton.setTitleColor(AppColors.primary, for: .normal)
+        saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        saveButton.addTarget(self, action: #selector(saveToGallery), for: .touchUpInside)
+        saveButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(saveButton)
 
         canvasView.backgroundColor = AppColors.card
         canvasView.layer.cornerRadius = 16
@@ -50,6 +59,7 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         canvasView.layer.borderColor = AppColors.primary.cgColor
         canvasView.translatesAutoresizingMaskIntoConstraints = false
         canvasView.isUserInteractionEnabled = true
+        canvasView.clipsToBounds = true
         view.addSubview(canvasView)
         
         [addImageButton, addTextButton].forEach {
@@ -66,16 +76,22 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         addTextButton.addTarget(self, action: #selector(addText), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
+            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
             clearButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             clearButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            canvasView.topAnchor.constraint(equalTo: clearButton.bottomAnchor, constant: 10),
+    
+            canvasView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 10),
             canvasView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             canvasView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             canvasView.bottomAnchor.constraint(equalTo: addImageButton.topAnchor, constant: -20),
+            
             addImageButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addImageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             addImageButton.widthAnchor.constraint(equalToConstant: 120),
             addImageButton.heightAnchor.constraint(equalToConstant: 45),
+            
             addTextButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addTextButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             addTextButton.widthAnchor.constraint(equalToConstant: 120),
@@ -143,7 +159,7 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         toolsStack.addArrangedSubview(sizeSlider)
 
         NSLayoutConstraint.activate([
-            toolsPanel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            toolsPanel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
             toolsPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             toolsStack.topAnchor.constraint(equalTo: toolsPanel.topAnchor, constant: 10),
             toolsStack.bottomAnchor.constraint(equalTo: toolsPanel.bottomAnchor, constant: -10),
@@ -200,20 +216,37 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
     }
 
     // MARK: - Actions
-    @objc private func hideTools() { toolsPanel.isHidden = true; editOverlay?.removeFromSuperview(); currentTextView = nil }
+    @objc private func hideTools() {
+        toolsPanel.isHidden = true
+        editOverlay?.removeFromSuperview()
+        currentTextView = nil
+    }
 
     @objc private func clearCanvas() {
-        canvasView.subviews.forEach { $0.removeFromSuperview() }
-        hideTools()
+        let alert = UIAlertController(title: "Очистить всё?", message: "Это действие нельзя отменить", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { _ in
+            self.canvasView.subviews.forEach { $0.removeFromSuperview() }
+            self.hideTools()
+        })
+        present(alert, animated: true)
     }
 
     @objc private func addText() {
         let tv = UITextView(frame: CGRect(x: 50, y: 50, width: 150, height: 60))
-        tv.text = "Текст"; tv.font = .systemFont(ofSize: 20); tv.backgroundColor = .clear; tv.isScrollEnabled = false
-        addGestures(to: tv); canvasView.addSubview(tv)
+        tv.text = "Текст"
+        tv.font = .systemFont(ofSize: 20)
+        tv.backgroundColor = .clear
+        tv.isScrollEnabled = false
+        addGestures(to: tv)
+        canvasView.addSubview(tv)
     }
 
-    @objc private func addImage() { let picker = UIImagePickerController(); picker.delegate = self; present(picker, animated: true) }
+    @objc private func addImage() {
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        present(picker, animated: true)
+    }
 
     @objc private func selectView(_ g: UITapGestureRecognizer) {
         guard let v = g.view as? UITextView else { return }
@@ -225,14 +258,38 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
     private func showOverlay(for tv: UITextView) {
         editOverlay?.removeFromSuperview()
         let overlay = UIView(frame: tv.frame.insetBy(dx: -5, dy: -5))
-        overlay.layer.borderWidth = 2; overlay.layer.borderColor = AppColors.primary.cgColor
-        canvasView.addSubview(overlay); editOverlay = overlay
+        overlay.layer.borderWidth = 2
+        overlay.layer.borderColor = AppColors.primary.cgColor
+        canvasView.addSubview(overlay)
+        editOverlay = overlay
     }
     
     private func updateOverlay(for v: UIView) {
         guard let tv = v as? UITextView, let overlay = editOverlay else { return }
         overlay.frame = tv.frame.insetBy(dx: -5, dy: -5)
         overlay.transform = tv.transform
+    }
+
+    // MARK: - Save Logic
+    @objc private func saveToGallery() {
+        hideTools()
+        let renderer = UIGraphicsImageRenderer(bounds: canvasView.bounds)
+        let image = renderer.image { context in
+            canvasView.drawHierarchy(in: canvasView.bounds, afterScreenUpdates: true)
+        }
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            let ac = UIAlertController(title: "Ошибка", message: error.localizedDescription, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        } else {
+            let ac = UIAlertController(title: "Сохранено!", message: "Ваша карта желаний теперь в галерее.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Супер", style: .default))
+            present(ac, animated: true)
+        }
     }
 
     // MARK: - Style Actions
@@ -255,7 +312,9 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         let descriptor = font.fontDescriptor
         var traits = descriptor.symbolicTraits
         if traits.contains(trait) { traits.remove(trait) } else { traits.insert(trait) }
-        tv.font = UIFont(descriptor: descriptor.withSymbolicTraits(traits)!, size: font.pointSize)
+        if let newDescriptor = descriptor.withSymbolicTraits(traits) {
+            tv.font = UIFont(descriptor: newDescriptor, size: font.pointSize)
+        }
     }
 
     @objc private func handleUnderline() { applyAttr(.underlineStyle, value: NSUnderlineStyle.single.rawValue) }
@@ -281,10 +340,13 @@ class WishMapEditorViewController: UIViewController, UIImagePickerControllerDele
         tv.text = tv.text.hasPrefix(prefix) ? String(tv.text.dropFirst(2)) : prefix + tv.text
     }
 
+    // MARK: - Image Picker
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
         if let image = info[.originalImage] as? UIImage {
             let iv = UIImageView(image: image)
+            iv.contentMode = .scaleAspectFill
+            iv.clipsToBounds = true
             iv.frame = CGRect(x: 50, y: 50, width: 150, height: 150)
             iv.isUserInteractionEnabled = true
             addGestures(to: iv)
