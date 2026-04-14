@@ -267,7 +267,9 @@ class WellBeingTestViewController: UIViewController {
     private func showFinalResults() {
         let names = ["Отношения", "Автономия", "Мастерство", "Рост", "Цели", "Самопринятие"]
         var report = ""
-
+        
+        let totalScore = scaleScores.reduce(0, +)
+        
         for i in 0..<6 {
             let score = scaleScores[i]
             let name = names[i]
@@ -311,6 +313,14 @@ class WellBeingTestViewController: UIViewController {
             
             report += "\(name): \(score) б. (\(level))\n\(interpretation)\n\n"
         }
+
+        let overallStatus = "Общий балл: \(totalScore)"
+        
+        TestHistoryViewController.saveResult(
+            testName: "Психологическое благополучие",
+            score: Double(totalScore),
+            status: overallStatus
+        )
 
         let alert = UIAlertController(title: "Результаты теста", message: nil, preferredStyle: .alert)
         let textView = UITextView()

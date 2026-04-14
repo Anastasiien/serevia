@@ -1,7 +1,8 @@
-// ExploreViewController.swift
-// serevia
 //
-// Created by ekatizzz 10.03.2026.
+//  ExploreViewController.swift
+//  serevia
+//
+//  Created by ekatizzz 10.03.2026.
 //
 
 import UIKit
@@ -14,6 +15,7 @@ class ExploreViewController: UIViewController {
     private let textMid  = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
     private let cardBg   = UIColor.white
     private let bgMain = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1)
+    
     private let scrollView  = UIScrollView()
     private let contentView = UIView()
 
@@ -92,15 +94,15 @@ class ExploreViewController: UIViewController {
         let wishHeader = makeSectionHeader("Карта желаний")
         let wishCard = makeWishMapCard()
 
-        let testsHeader = makeSectionHeader("Тесты")
-        let testsStack = makeTestsStack()
+        // Изменённая секция тестов с кнопкой "История"
+        let testsSection = makeTestsSection()
 
         let mainStack = UIStackView(arrangedSubviews: [
             titleLabel, subtitleLabel,
             articlesHeader, articlesScroll,
             podcastsHeader, podcastsScroll,
             wishHeader, wishCard,
-            testsHeader, testsStack
+            testsSection
         ])
         
         mainStack.axis = .vertical
@@ -113,7 +115,7 @@ class ExploreViewController: UIViewController {
         mainStack.setCustomSpacing(28, after: podcastsScroll)
         mainStack.setCustomSpacing(14, after: wishHeader)
         mainStack.setCustomSpacing(28, after: wishCard)
-        mainStack.setCustomSpacing(14, after: testsHeader)
+        mainStack.setCustomSpacing(14, after: testsSection)
         
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         mainStack.isLayoutMarginsRelativeArrangement = true
@@ -134,6 +136,34 @@ class ExploreViewController: UIViewController {
         l.font = .systemFont(ofSize: 18, weight: .bold)
         l.textColor = textDark
         return l
+    }
+
+    // MARK: - New tests section with a "History" button
+    private func makeTestsSection() -> UIStackView {й
+        let headerStack = UIStackView()
+        headerStack.axis = .horizontal
+        headerStack.alignment = .center
+        headerStack.distribution = .equalSpacing
+        headerStack.spacing = 8
+        
+        let titleLabel = makeSectionHeader("Тесты")
+        
+        let historyButton = UIButton(type: .system)
+        historyButton.setTitle("История", for: .normal)
+        historyButton.setTitleColor(accent, for: .normal)
+        historyButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        historyButton.addTarget(self, action: #selector(showTestHistory), for: .touchUpInside)
+        
+        headerStack.addArrangedSubview(titleLabel)
+        headerStack.addArrangedSubview(historyButton)
+        
+        let testsStack = makeTestsStack()
+        
+        let mainTestsStack = UIStackView(arrangedSubviews: [headerStack, testsStack])
+        mainTestsStack.axis = .vertical
+        mainTestsStack.spacing = 14
+        
+        return mainTestsStack
     }
 
     // MARK: - Podcasts Logic
@@ -489,12 +519,11 @@ class ExploreViewController: UIViewController {
             navigationController?.pushViewController(vc, animated: true)
             
         case "Психологическое благополучие":
-                let vc = WellBeingTestViewController()
-                vc.hidesBottomBarWhenPushed = true
-                navigationController?.pushViewController(vc, animated: true)
+            let vc = WellBeingTestViewController()
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
             
         default:
-            // Заглушка для остальных тестов
             let vc = UIViewController()
             vc.view.backgroundColor = AppColors.background
             let l = UILabel()
@@ -514,5 +543,12 @@ class ExploreViewController: UIViewController {
     @objc private func openWishMap() {
         let wishMapVC = WishMapEditorViewController()
         navigationController?.pushViewController(wishMapVC, animated: true)
+    }
+
+    // MARK: - Opening test history
+    @objc private func showTestHistory() {
+        let historyVC = TestHistoryViewController()
+        historyVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(historyVC, animated: true)
     }
 }

@@ -215,6 +215,12 @@ class MindfulnessTestViewController: UIViewController {
         let averageScore = Double(totalPoints) / 15.0
         let (status, description) = interpretScore(averageScore)
         
+        TestHistoryViewController.saveResult(
+            testName: "Внимательность и осознанность",
+            score: Double(averageScore),
+            status: status
+        )
+        
         let alert = UIAlertController(
             title: String(format: "Ваш балл: %.1f", averageScore),
             message: "\(status)\n\n\(description)",

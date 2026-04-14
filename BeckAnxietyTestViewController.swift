@@ -226,6 +226,12 @@ class BeckAnxietyTestViewController: UIViewController {
     private func showResults() {
         let (status, description) = interpretScore(totalScore)
         
+        TestHistoryViewController.saveResult(
+            testName: "Уровень тревожности",
+            score: Double(totalScore),
+            status: status
+        )
+        
         let alert = UIAlertController(
             title: "Результат: \(totalScore) баллов",
             message: "\(status)\n\n\(description)",
