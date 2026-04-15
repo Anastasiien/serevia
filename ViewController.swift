@@ -1,5 +1,9 @@
 import UIKit
 
+extension Notification.Name {
+    static let userDataDidChange = Notification.Name("userDataDidChange")
+}
+
 // MARK: - Habit Model
 struct Habit: Codable {
     let title: String
@@ -14,6 +18,7 @@ class HomeViewController: UIViewController {
     private let textMid   = AppColors.lightText
     private let cardBg    = AppColors.card
     private let pageBg    = AppColors.background
+    private let greetingLabel = UILabel()
     
     // MARK: - Phrase
     private let typingLabel = UILabel()
@@ -72,8 +77,51 @@ class HomeViewController: UIViewController {
         resetHabitsIfNeeded()
         updateStreak()
         updateHabitsProgress()
+        setupProfileButton()
+        loadHabits()
+        updateHabitsProgress()
+        
+        NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(refreshGreeting),
+                                                   name: .userDataDidChange,
+                                                   object: nil)
+    }
+    
+    // MARK: - Navigation
+    @objc private func profileButtonTapped() {
+        let profileVC = ProfileViewController()
+        profileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(profileVC, animated: true)
+    }
+    
+    @objc private func refreshGreeting() {
+        let savedName = UserDefaults.standard.string(forKey: "userName") ?? "Анастасия"
+        greetingLabel.text = "Привет, \(savedName)"
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - Profile Button
+    private func setupProfileButton() {
+        navigationItem.title = ""
+        title = ""
+        let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+        let profileImage = UIImage(systemName: "person.circle", withConfiguration: config)
+        let profileButton = UIBarButtonItem(
+            image: profileImage,
+            style: .plain,
+            target: self,
+            action: #selector(profileButtonTapped)
+        )
+        
+        profileButton.tintColor = accent
+        navigationItem.rightBarButtonItem = profileButton
+        navigationItem.backButtonTitle = ""
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    
     // MARK: - Streak
     private func updateStreak() {
         let calendar = Calendar.current
@@ -135,8 +183,8 @@ class HomeViewController: UIViewController {
         logoLabel.textAlignment = .center
 
         // ── Greeting ──
-        let greetingLabel = UILabel()
-        greetingLabel.text = "Привет, Анастасия"
+        let savedName = UserDefaults.standard.string(forKey: "userName") ?? "Гость"
+        greetingLabel.text = "Привет, \(savedName)"
         greetingLabel.font = .systemFont(ofSize: 20, weight: .regular)
         greetingLabel.textColor = textMid
         greetingLabel.textAlignment = .center
