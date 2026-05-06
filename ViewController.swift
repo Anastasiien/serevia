@@ -1,6 +1,10 @@
 import UIKit
 
-// MARK: - Habit Model
+extension Notification.Name {
+    static let userDataDidChange = Notification.Name("userDataDidChange")
+    static let wishMapDidUpdate  = Notification.Name("wishMapDidUpdate")
+}
+
 struct Habit: Codable {
     let title: String
     var isCompleted: Bool
@@ -8,15 +12,17 @@ struct Habit: Codable {
 
 class HomeViewController: UIViewController {
 
-    // MARK: - Constants
-    private let accent    = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-    private let textDark  = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
-    private let textMid   = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
-    private let cardBg    = UIColor.white
+    private let accent    = AppColors.primary
+    private let textDark  = AppColors.text
+    private let textMid   = AppColors.lightText
+    private let cardBg    = AppColors.card
+    private let pageBg    = AppColors.background
+    private let greetingLabel = UILabel()
 
-    // MARK: - Phrase
     private let typingLabel = UILabel()
     private var currentPhraseIndex = 0
+    private var phraseTimer: Timer?
+    private let phraseIndexKey = "savedPhraseIndex"
     private let phrases = [
         "Спокойствие — это суперсила",
         "Ты сильнее, чем думаешь",
@@ -32,7 +38,6 @@ class HomeViewController: UIViewController {
         "Настройся на позитив"
     ]
 
-    // MARK: - Streak / Progress
     private let habitsProgress = UILabel()
     private let streakNumber   = UILabel()
     private let topLabel       = UILabel()
@@ -55,14 +60,16 @@ class HomeViewController: UIViewController {
         set { UserDefaults.standard.set(newValue, forKey: lastStreakDateKey) }
     }
 
-    // MARK: - Habits
     private var habits: [Habit] = [] {
         didSet { saveHabits(); reloadHabitStack() }
     }
     private let habitsContainerCard = UIView()
     private let habitStack = UIStackView()
 
-    // MARK: - Lifecycle
+    // wish map — скрыта если нет картинки
+    private let wishMapCard = UIView()
+    private let wishMapImageView = UIImageView()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = AppColors.background
@@ -71,14 +78,83 @@ class HomeViewController: UIViewController {
         resetHabitsIfNeeded()
         updateStreak()
         updateHabitsProgress()
+        setupProfileButton()
+        loadHabits()
+        updateHabitsProgress()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshGreeting), name: .userDataDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshWishMap), name: .wishMapDidUpdate, object: nil)
+
+        rotatePhraseOnAppear()
+        startPhraseTimer()
     }
 
-    // MARK: - Streak
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshWishMap()
+        rotatePhraseOnAppear()
+    }
+
+    // меняем фразу при каждом заходе, индекс сохраняется между сессиями
+    private func rotatePhraseOnAppear() {
+        let saved = UserDefaults.standard.integer(forKey: phraseIndexKey)
+        let next = (saved + 1) % phrases.count
+        currentPhraseIndex = next
+        UserDefaults.standard.set(next, forKey: phraseIndexKey)
+        UIView.transition(with: typingLabel, duration: 0.4, options: .transitionCrossDissolve) {
+            self.typingLabel.text = self.phrases[self.currentPhraseIndex]
+        }
+    }
+
+    // дополнительно меняем каждые 2 часа пока приложение открыто
+    private func startPhraseTimer() {
+        phraseTimer?.invalidate()
+        phraseTimer = Timer.scheduledTimer(withTimeInterval: 2 * 60 * 60, repeats: true) { [weak self] _ in
+            self?.rotatePhraseOnAppear()
+        }
+    }
+
+    @objc private func profileButtonTapped() {
+        let profileVC = ProfileViewController()
+        profileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(profileVC, animated: true)
+    }
+
+    @objc private func refreshGreeting() {
+        let savedName = UserDefaults.standard.string(forKey: "userName") ?? "Анастасия"
+        greetingLabel.text = "Привет, \(savedName)"
+    }
+
+    // FIX 1: показываем карту только если есть сохранённое изображение
+    @objc private func refreshWishMap() {
+        if let data = UserDefaults.standard.data(forKey: "wishMapImage"),
+           let image = UIImage(data: data) {
+            wishMapImageView.image = image
+            wishMapCard.isHidden = false
+        } else {
+            wishMapCard.isHidden = true
+        }
+    }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
+
+    private func setupProfileButton() {
+        title = "Home"
+        navigationItem.title = ""
+        let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+        let profileImage = UIImage(systemName: "person.circle", withConfiguration: config)
+        let profileButton = UIBarButtonItem(image: profileImage, style: .plain, target: self, action: #selector(profileButtonTapped))
+        profileButton.tintColor = accent
+        navigationItem.rightBarButtonItem = profileButton
+        navigationItem.backButtonTitle = ""
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+
     private func updateStreak() {
         let calendar = Calendar.current
         if let last = lastStreakDate {
-            if calendar.isDateInYesterday(last)     { currentStreak += 1 }
-            else if !calendar.isDateInToday(last)   { currentStreak = 1 }
+            if calendar.isDateInYesterday(last)   { currentStreak += 1 }
+            else if !calendar.isDateInToday(last) { currentStreak = 1 }
         } else { currentStreak = 1 }
         if currentStreak > topStreak { topStreak = currentStreak }
         lastStreakDate = Date()
@@ -100,7 +176,6 @@ class HomeViewController: UIViewController {
         }
     }
 
-    // MARK: - UI Setup
     private func setupUI() {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
@@ -124,111 +199,160 @@ class HomeViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
 
-        // ── Logo ──
+        // FIX 4: дата сверху + логотип + приветствие + разделитель
+        let dateLabel = UILabel()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "EEEE, d MMMM"
+        let raw = formatter.string(from: Date())
+        dateLabel.text = raw.prefix(1).uppercased() + raw.dropFirst()
+        dateLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        dateLabel.textColor = textMid.withAlphaComponent(0.7)
+        dateLabel.textAlignment = .center
+
         let logoLabel = UILabel()
         let attributed = NSMutableAttributedString(string: "SEREVIA")
         attributed.addAttribute(.kern, value: 8, range: NSRange(location: 0, length: attributed.length))
         logoLabel.attributedText = attributed
-        logoLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        logoLabel.font = .systemFont(ofSize: 32, weight: .bold)
         logoLabel.textColor = textDark
         logoLabel.textAlignment = .center
 
-        // ── Greeting ──
-        let greetingLabel = UILabel()
-        greetingLabel.text = "Привет, Анастасия"
-        greetingLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        let savedName = UserDefaults.standard.string(forKey: "userName") ?? "Гость"
+        greetingLabel.text = "Привет, \(savedName)"
+        greetingLabel.font = .systemFont(ofSize: 20, weight: .regular)
         greetingLabel.textColor = textMid
         greetingLabel.textAlignment = .center
 
+        let headerDivider = UIView()
+        headerDivider.backgroundColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 0.2)
+        headerDivider.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        headerDivider.translatesAutoresizingMaskIntoConstraints = false
+
+        let headerStack = UIStackView(arrangedSubviews: [dateLabel, logoLabel, greetingLabel, headerDivider])
+        headerStack.axis = .vertical
+        headerStack.spacing = 4
+        headerStack.setCustomSpacing(14, after: greetingLabel)
+
         // ── Quote card ──
         let quoteCard = makeCard()
+        quoteCard.clipsToBounds = true
+        let flowerBg = UIImageView()
+        flowerBg.image = UIImage(named: "floral_pattern")
+        flowerBg.contentMode = .scaleAspectFill
+        flowerBg.alpha = 0.2
+        flowerBg.translatesAutoresizingMaskIntoConstraints = false
+        quoteCard.addSubview(flowerBg)
 
         typingLabel.text = phrases.first
-        typingLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        typingLabel.font = .systemFont(ofSize: 18, weight: .medium).italic()
         typingLabel.textColor = textDark
-        typingLabel.textAlignment = .center
         typingLabel.numberOfLines = 0
 
-        let morePhraseButton = UIButton(type: .system)
-        morePhraseButton.setTitle("⟳  Ещё фраза", for: .normal)
-        morePhraseButton.setTitleColor(textMid, for: .normal)
-        morePhraseButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        morePhraseButton.backgroundColor = UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
-        morePhraseButton.layer.cornerRadius = 16
-        morePhraseButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 28, bottom: 10, right: 28)
-        morePhraseButton.addTarget(self, action: #selector(nextPhrase), for: .touchUpInside)
+        let refreshBtn = UIButton(type: .system)
+        let cfg = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+        refreshBtn.setImage(UIImage(systemName: "arrow.clockwise", withConfiguration: cfg), for: .normal)
+        refreshBtn.tintColor = textMid
+        refreshBtn.backgroundColor = accent.withAlphaComponent(0.12)
+        refreshBtn.layer.cornerRadius = 14
+        refreshBtn.translatesAutoresizingMaskIntoConstraints = false
+        refreshBtn.addTarget(self, action: #selector(nextPhrase), for: .touchUpInside)
 
-        let quoteStack = UIStackView(arrangedSubviews: [typingLabel, morePhraseButton])
-        quoteStack.axis = .vertical
-        quoteStack.alignment = .center
-        quoteStack.spacing = 14
-        quoteStack.translatesAutoresizingMaskIntoConstraints = false
-        quoteCard.addSubview(quoteStack)
+        let quoteRow = UIStackView(arrangedSubviews: [typingLabel, refreshBtn])
+        quoteRow.axis = .horizontal
+        quoteRow.spacing = 12
+        quoteRow.alignment = .center
+        quoteRow.translatesAutoresizingMaskIntoConstraints = false
+        quoteCard.addSubview(quoteRow)
+
         NSLayoutConstraint.activate([
-            quoteStack.topAnchor.constraint(equalTo: quoteCard.topAnchor, constant: 20),
-            quoteStack.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor, constant: 20),
-            quoteStack.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor, constant: -20),
-            quoteStack.bottomAnchor.constraint(equalTo: quoteCard.bottomAnchor, constant: -20)
+            flowerBg.topAnchor.constraint(equalTo: quoteCard.topAnchor),
+            flowerBg.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor),
+            flowerBg.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor),
+            flowerBg.bottomAnchor.constraint(equalTo: quoteCard.bottomAnchor),
+            quoteCard.heightAnchor.constraint(equalToConstant: 80),
+            refreshBtn.widthAnchor.constraint(equalToConstant: 42),
+            refreshBtn.heightAnchor.constraint(equalToConstant: 42),
+            quoteRow.leadingAnchor.constraint(equalTo: quoteCard.leadingAnchor, constant: 20),
+            quoteRow.trailingAnchor.constraint(equalTo: quoteCard.trailingAnchor, constant: -16),
+            quoteRow.centerYAnchor.constraint(equalTo: quoteCard.centerYAnchor)
         ])
 
-        // ── Habits mini card ──
-        let habitsCard = makeCard()
-        let habitsTitle = makeSmallLabel("Привычки")
-
-        habitsProgress.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        habitsProgress.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-        updateHabitsProgress()
-
-        let habitsSubtitle = makeSmallLabel("Сегодня")
-
-        let habitsInnerStack = UIStackView(arrangedSubviews: [habitsTitle, habitsProgress])
-        habitsInnerStack.axis = .vertical
-        habitsInnerStack.distribution = .equalSpacing
-        habitsInnerStack.translatesAutoresizingMaskIntoConstraints = false
-        habitsCard.addSubview(habitsInnerStack)
-        habitsCard.addSubview(habitsSubtitle)
-        habitsSubtitle.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            habitsInnerStack.topAnchor.constraint(equalTo: habitsCard.topAnchor, constant: 16),
-            habitsInnerStack.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
-            habitsInnerStack.trailingAnchor.constraint(equalTo: habitsCard.trailingAnchor, constant: -16),
-            habitsSubtitle.topAnchor.constraint(equalTo: habitsInnerStack.bottomAnchor, constant: 8),
-            habitsSubtitle.leadingAnchor.constraint(equalTo: habitsCard.leadingAnchor, constant: 16),
-            habitsSubtitle.bottomAnchor.constraint(equalTo: habitsCard.bottomAnchor, constant: -12)
-        ])
-
-        // ── Streak card ──
-        let streakCard = makeCard()
-        let streakTitle = makeSmallLabel("Дней подряд")
-
-        streakNumber.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        streakNumber.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
-
-        topLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        // ── Stats row ──
+        let habitsCard  = makeFloralMiniCard(top: "Привычки", bottom: "Сегодня", big: habitsProgress)
+        let streakCardView = makeFloralMiniCard(top: "Дней подряд", bottom: "", big: streakNumber)
+        streakCardView.addSubview(topLabel)
+        topLabel.font = .systemFont(ofSize: 14, weight: .regular)
         topLabel.textColor = UIColor(red: 0.56, green: 0.47, blue: 0.38, alpha: 1)
-
-        let streakInnerStack = UIStackView(arrangedSubviews: [streakTitle, streakNumber, topLabel])
-        streakInnerStack.axis = .vertical
-        streakInnerStack.alignment = .center
-        streakInnerStack.spacing = 6
-        streakInnerStack.translatesAutoresizingMaskIntoConstraints = false
-        streakCard.addSubview(streakInnerStack)
+        topLabel.textAlignment = .center
+        topLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            streakInnerStack.topAnchor.constraint(equalTo: streakCard.topAnchor, constant: 16),
-            streakInnerStack.leadingAnchor.constraint(equalTo: streakCard.leadingAnchor, constant: 16),
-            streakInnerStack.trailingAnchor.constraint(equalTo: streakCard.trailingAnchor, constant: -16),
-            streakInnerStack.bottomAnchor.constraint(equalTo: streakCard.bottomAnchor, constant: -12)
+            topLabel.centerXAnchor.constraint(equalTo: streakCardView.centerXAnchor),
+            topLabel.bottomAnchor.constraint(equalTo: streakCardView.bottomAnchor, constant: -14)
         ])
 
-        let statsRow = UIStackView(arrangedSubviews: [habitsCard, streakCard])
+        let statsRow = UIStackView(arrangedSubviews: [habitsCard, streakCardView])
         statsRow.axis = .horizontal
         statsRow.distribution = .fillEqually
         statsRow.spacing = 14
 
-        // ── Habits container card ──
+        // ── Habits container ──
         setupHabitBlock()
 
-        // ── Diary button (no card wrapper) ──
+        // ── Wish map card ──
+        wishMapCard.backgroundColor = pageBg
+        wishMapCard.layer.cornerRadius = 22
+        wishMapCard.layer.shadowColor  = UIColor.black.cgColor
+        wishMapCard.layer.shadowOpacity = 0.06
+        wishMapCard.layer.shadowOffset  = CGSize(width: 0, height: 2)
+        wishMapCard.layer.shadowRadius  = 8
+        wishMapCard.layer.masksToBounds = false
+        wishMapCard.translatesAutoresizingMaskIntoConstraints = false
+        wishMapCard.isHidden = true
+
+
+        // ── Wish map card ──
+                // Настраиваем основной контейнер карточки (с рамкой как в редакторе)
+                wishMapCard.backgroundColor = AppColors.card
+                wishMapCard.layer.cornerRadius = 16
+                wishMapCard.layer.borderWidth = 1
+                wishMapCard.layer.borderColor = AppColors.primary.cgColor
+                wishMapCard.layer.shadowOpacity = 0 // Убираем тень для соответствия WishMapEditorViewController
+                wishMapCard.translatesAutoresizingMaskIntoConstraints = false
+                wishMapCard.isHidden = true // По умолчанию скрыта, пока refreshWishMap() не найдет фото
+
+                // Создаем внутренний слой для обрезки фото по углам
+                let wishMapClipView = UIView()
+                wishMapClipView.layer.cornerRadius = 16
+                wishMapClipView.clipsToBounds = true
+                wishMapClipView.translatesAutoresizingMaskIntoConstraints = false
+                wishMapCard.addSubview(wishMapClipView)
+
+                // Настраиваем саму картинку
+                wishMapImageView.contentMode = .scaleAspectFill
+                wishMapImageView.clipsToBounds = true
+                wishMapImageView.translatesAutoresizingMaskIntoConstraints = false // Нужно для работы констрейнтов
+                wishMapClipView.addSubview(wishMapImageView)
+
+                // Активируем констрейнты для корректного отображения размеров
+                NSLayoutConstraint.activate([
+                    // Соотношение сторон 4:3 как в редакторе[cite: 2]
+                    wishMapCard.heightAnchor.constraint(equalTo: wishMapCard.widthAnchor, multiplier: 3.0/4.0),
+                    
+                    // Растягиваем контейнер обрезки на всю карточку
+                    wishMapClipView.topAnchor.constraint(equalTo: wishMapCard.topAnchor),
+                    wishMapClipView.leadingAnchor.constraint(equalTo: wishMapCard.leadingAnchor),
+                    wishMapClipView.trailingAnchor.constraint(equalTo: wishMapCard.trailingAnchor),
+                    wishMapClipView.bottomAnchor.constraint(equalTo: wishMapCard.bottomAnchor),
+                    
+                    // Растягиваем картинку на весь контейнер
+                    wishMapImageView.topAnchor.constraint(equalTo: wishMapClipView.topAnchor),
+                    wishMapImageView.leadingAnchor.constraint(equalTo: wishMapClipView.leadingAnchor),
+                    wishMapImageView.trailingAnchor.constraint(equalTo: wishMapClipView.trailingAnchor),
+                    wishMapImageView.bottomAnchor.constraint(equalTo: wishMapClipView.bottomAnchor)
+                ])
+
+        // ── Diary button ──
         let diaryButton = UIButton(type: .system)
         diaryButton.setTitle("Мой дневник", for: .normal)
         diaryButton.setTitleColor(.white, for: .normal)
@@ -237,16 +361,10 @@ class HomeViewController: UIViewController {
         diaryButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         diaryButton.heightAnchor.constraint(equalToConstant: 54).isActive = true
         diaryButton.addTarget(self, action: #selector(openDiary), for: .touchUpInside)
-        diaryButton.translatesAutoresizingMaskIntoConstraints = false
 
-        // ── Main stack ──
         let mainStack = UIStackView(arrangedSubviews: [
-            logoLabel,
-            greetingLabel,
-            quoteCard,
-            statsRow,
-            habitsContainerCard,
-            diaryButton
+            headerStack, quoteCard, statsRow,
+            habitsContainerCard, wishMapCard, diaryButton
         ])
         mainStack.axis = .vertical
         mainStack.alignment = .fill
@@ -261,9 +379,60 @@ class HomeViewController: UIViewController {
             mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
+
+        refreshWishMap()
     }
 
-    // MARK: - Helpers
+    // мини-карточка для статистики (привычки / стрик) с floral фоном
+    private func makeFloralMiniCard(top: String, bottom: String, big: UILabel) -> UIView {
+        let card = makeCard()
+        card.clipsToBounds = true
+        card.heightAnchor.constraint(equalToConstant: 110).isActive = true
+
+        let pattern = UIImageView()
+        pattern.image = UIImage(named: "floral_pattern")
+        pattern.contentMode = .scaleAspectFill
+        pattern.alpha = 0.2
+        pattern.transform = CGAffineTransform(scaleX: 1.6, y: 1.6)
+        pattern.translatesAutoresizingMaskIntoConstraints = false
+        card.addSubview(pattern)
+
+        let topLbl = makeSmallLabel(top)
+        topLbl.textAlignment = .center
+        big.font = .systemFont(ofSize: 30, weight: .bold)
+        big.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1)
+        big.textAlignment = .center
+
+        let inner = UIStackView(arrangedSubviews: [topLbl, big])
+        inner.axis = .vertical
+        inner.spacing = 2
+        inner.alignment = .center
+        inner.translatesAutoresizingMaskIntoConstraints = false
+        card.addSubview(inner)
+
+        if !bottom.isEmpty {
+            let botLbl = makeSmallLabel(bottom)
+            botLbl.textAlignment = .center
+            botLbl.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(botLbl)
+            NSLayoutConstraint.activate([
+                botLbl.centerXAnchor.constraint(equalTo: card.centerXAnchor),
+                botLbl.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -14)
+            ])
+        }
+
+        NSLayoutConstraint.activate([
+            pattern.topAnchor.constraint(equalTo: card.topAnchor),
+            pattern.leadingAnchor.constraint(equalTo: card.leadingAnchor),
+            pattern.trailingAnchor.constraint(equalTo: card.trailingAnchor),
+            pattern.bottomAnchor.constraint(equalTo: card.bottomAnchor),
+            inner.topAnchor.constraint(equalTo: card.topAnchor, constant: 14),
+            inner.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
+            inner.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -16)
+        ])
+        return card
+    }
+
     private func makeCard() -> UIView {
         let v = UIView()
         v.backgroundColor = cardBg
@@ -284,7 +453,6 @@ class HomeViewController: UIViewController {
         return l
     }
 
-    // MARK: - Habit Block
     private func setupHabitBlock() {
         habitsContainerCard.backgroundColor = cardBg
         habitsContainerCard.layer.cornerRadius = 22
@@ -292,7 +460,29 @@ class HomeViewController: UIViewController {
         habitsContainerCard.layer.shadowOpacity = 0.04
         habitsContainerCard.layer.shadowOffset = CGSize(width: 0, height: 2)
         habitsContainerCard.layer.shadowRadius = 6
+        habitsContainerCard.clipsToBounds = true
         habitsContainerCard.translatesAutoresizingMaskIntoConstraints = false
+
+        if let orig = UIImage(named: "floral_pattern") {
+            let sz = CGSize(width: orig.size.width / 2.5, height: orig.size.height / 2.5)
+            UIGraphicsBeginImageContextWithOptions(sz, false, 0)
+            orig.draw(in: CGRect(origin: .zero, size: sz))
+            let scaled = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            habitsContainerCard.backgroundColor = UIColor(patternImage: scaled ?? orig)
+        }
+
+        let overlay = UIView()
+        overlay.backgroundColor = cardBg
+        overlay.alpha = 0.8
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        habitsContainerCard.addSubview(overlay)
+        NSLayoutConstraint.activate([
+            overlay.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor),
+            overlay.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor),
+            overlay.trailingAnchor.constraint(equalTo: habitsContainerCard.trailingAnchor),
+            overlay.bottomAnchor.constraint(equalTo: habitsContainerCard.bottomAnchor)
+        ])
 
         let titleLabel = UILabel()
         titleLabel.text = "Мои привычки"
@@ -312,27 +502,25 @@ class HomeViewController: UIViewController {
         habitStack.spacing = 2
         habitStack.translatesAutoresizingMaskIntoConstraints = false
 
-        let containerStack = UIStackView(arrangedSubviews: [titleLabel, habitStack, addButton])
-        containerStack.axis = .vertical
-        containerStack.spacing = 12
-        containerStack.translatesAutoresizingMaskIntoConstraints = false
-        habitsContainerCard.addSubview(containerStack)
+        let cs = UIStackView(arrangedSubviews: [titleLabel, habitStack, addButton])
+        cs.axis = .vertical
+        cs.spacing = 12
+        cs.translatesAutoresizingMaskIntoConstraints = false
+        habitsContainerCard.addSubview(cs)
         NSLayoutConstraint.activate([
-            containerStack.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor, constant: 20),
-            containerStack.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor, constant: 20),
-            containerStack.trailingAnchor.constraint(equalTo: habitsContainerCard.trailingAnchor, constant: -20),
-            containerStack.bottomAnchor.constraint(equalTo: habitsContainerCard.bottomAnchor, constant: -20)
+            cs.topAnchor.constraint(equalTo: habitsContainerCard.topAnchor, constant: 20),
+            cs.leadingAnchor.constraint(equalTo: habitsContainerCard.leadingAnchor, constant: 20),
+            cs.trailingAnchor.constraint(equalTo: habitsContainerCard.trailingAnchor, constant: -20),
+            cs.bottomAnchor.constraint(equalTo: habitsContainerCard.bottomAnchor, constant: -20)
         ])
     }
 
     private func reloadHabitStack() {
         habitStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-
         for (index, habit) in habits.enumerated() {
             let row = UIView()
             row.translatesAutoresizingMaskIntoConstraints = false
 
-            // Circle / check indicator
             let indicator = UIView()
             indicator.layer.cornerRadius = 11
             indicator.layer.borderWidth = 1.5
@@ -341,7 +529,6 @@ class HomeViewController: UIViewController {
             if habit.isCompleted {
                 indicator.backgroundColor = accent
                 indicator.layer.borderColor = accent.cgColor
-                // Checkmark
                 let check = UILabel()
                 check.text = "✓"
                 check.font = .systemFont(ofSize: 11, weight: .bold)
@@ -359,15 +546,15 @@ class HomeViewController: UIViewController {
             }
 
             let titleLabel = UILabel()
-            titleLabel.text = habit.title
             titleLabel.font = .systemFont(ofSize: 15, weight: habit.isCompleted ? .regular : .medium)
             titleLabel.textColor = habit.isCompleted ? textMid : textDark
             if habit.isCompleted {
-                let attr = NSAttributedString(string: habit.title, attributes: [
+                titleLabel.attributedText = NSAttributedString(string: habit.title, attributes: [
                     .strikethroughStyle: NSUnderlineStyle.single.rawValue,
                     .foregroundColor: textMid
                 ])
-                titleLabel.attributedText = attr
+            } else {
+                titleLabel.text = habit.title
             }
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
@@ -384,49 +571,37 @@ class HomeViewController: UIViewController {
                 row.heightAnchor.constraint(equalToConstant: 44)
             ])
 
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleHabitRow(_:)))
-            tapGesture.view?.tag = index
             row.tag = index
-            row.addGestureRecognizer(tapGesture)
             row.isUserInteractionEnabled = true
-
-            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-            row.addGestureRecognizer(longPress)
-
+            let tap = UITapGestureRecognizer(target: self, action: #selector(toggleHabitRow(_:)))
+            row.addGestureRecognizer(tap)
+            let lp = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+            row.addGestureRecognizer(lp)
             habitStack.addArrangedSubview(row)
 
-            // Subtle divider (not after last)
             if index < habits.count - 1 {
-                let divider = UIView()
-                divider.backgroundColor = UIColor(red: 0.90, green: 0.87, blue: 0.82, alpha: 1)
-                divider.translatesAutoresizingMaskIntoConstraints = false
-                divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
-                habitStack.addArrangedSubview(divider)
+                let div = UIView()
+                div.backgroundColor = UIColor(red: 0.90, green: 0.87, blue: 0.82, alpha: 1)
+                div.translatesAutoresizingMaskIntoConstraints = false
+                div.heightAnchor.constraint(equalToConstant: 1).isActive = true
+                habitStack.addArrangedSubview(div)
             }
         }
         updateHabitsProgress()
     }
 
     @objc private func toggleHabitRow(_ gesture: UITapGestureRecognizer) {
-        guard let view = gesture.view else { return }
-        let index = view.tag
-        habits[index].isCompleted.toggle()
-        reloadHabitStack()
-    }
-
-    @objc private func toggleHabit(_ sender: UIButton) {
-        habits[sender.tag].isCompleted.toggle()
+        guard let v = gesture.view else { return }
+        habits[v.tag].isCompleted.toggle()
         reloadHabitStack()
     }
 
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began, let view = gesture.view else { return }
-        let index = view.tag
-        guard index < habits.count else { return }
-        let alert = UIAlertController(title: "Удалить привычку?", message: "«\(habits[index].title)»", preferredStyle: .alert)
+        guard gesture.state == .began, let v = gesture.view, v.tag < habits.count else { return }
+        let alert = UIAlertController(title: "Удалить привычку?", message: "«\(habits[v.tag].title)»", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
-            self?.habits.remove(at: index)
+            self?.habits.remove(at: v.tag)
             self?.updateHabitsProgress()
         })
         present(alert, animated: true)
@@ -437,7 +612,6 @@ class HomeViewController: UIViewController {
         habitsProgress.text = "\(completed) / \(habits.count)"
     }
 
-    // MARK: - Actions
     @objc private func nextPhrase() {
         currentPhraseIndex = (currentPhraseIndex + 1) % phrases.count
         UIView.transition(with: typingLabel, duration: 0.3, options: .transitionCrossDissolve) {
@@ -462,7 +636,6 @@ class HomeViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    // MARK: - Persistence
     private func saveHabits() {
         if let data = try? JSONEncoder().encode(habits) {
             UserDefaults.standard.set(data, forKey: "habits")
@@ -474,5 +647,12 @@ class HomeViewController: UIViewController {
            let saved = try? JSONDecoder().decode([Habit].self, from: data) {
             habits = saved
         }
+    }
+}
+
+extension UIFont {
+    func italic() -> UIFont { withTraits(traits: .traitItalic) }
+    func withTraits(traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
+        UIFont(descriptor: fontDescriptor.withSymbolicTraits(traits)!, size: 0)
     }
 }

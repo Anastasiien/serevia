@@ -3,12 +3,11 @@ import UIKit
 class JournalViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIColorPickerViewControllerDelegate {
 
     // MARK: - Constants
-    private let accent     = UIColor(red: 0.49, green: 0.38, blue: 0.27, alpha: 1)
-    private let cardBg     = UIColor.white
-    private let pageBg     = AppColors.background
+    private let accent     = UIColor(red: 0.58, green: 0.46, blue: 0.42, alpha: 1)
+    private let pageBg     = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1)
     private let textDark   = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
     private let textMid    = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
-    private let tagInactive = UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
+    private let tagInactive = UIColor(red: 0.88, green: 0.85, blue: 0.81, alpha: 1.0)
     private let tagBorder   = UIColor(red: 0.84, green: 0.79, blue: 0.73, alpha: 1)
 
     // MARK: - Data
@@ -18,17 +17,15 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     private let tagsKey = "saved_tags"
     private var customColorButtons: [UIButton] = []
     private let defaultColors: [UIColor] = [
-        UIColor(red: 1.0, green: 0.6,  blue: 0.6,  alpha: 1),
-        UIColor(red: 1.0, green: 0.7,  blue: 0.85, alpha: 1),
-        UIColor(red: 1.0, green: 0.9,  blue: 0.5,  alpha: 1),
+        UIColor(red: 1.0,  green: 0.6,  blue: 0.6,  alpha: 1),
+        UIColor(red: 1.0,  green: 0.7,  blue: 0.85, alpha: 1),
+        UIColor(red: 1.0,  green: 0.9,  blue: 0.5,  alpha: 1),
         UIColor(red: 0.75, green: 0.65, blue: 0.95, alpha: 1),
         UIColor(red: 0.55, green: 0.8,  blue: 0.95, alpha: 1),
         UIColor(red: 0.4,  green: 0.6,  blue: 0.95, alpha: 1)
     ]
     private var currentColors: [UIColor] = []
     private let colorsKey = "saved_colors_list"
-
-    // MARK: - Tags
     private var tags: [String] = ["Работа", "Учёба", "Отдых", "Семья", "Здоровье"]
     private var selectedTags: [String] = []
 
@@ -38,47 +35,13 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     }
 
     // MARK: - UI Elements
-
-    // Header
-    private lazy var titleLabel: UILabel = {
-        let l = UILabel()
-        l.text = "Мой дневник"
-        l.font = .systemFont(ofSize: 30, weight: .bold)
-        l.textAlignment = .center
-        l.textColor = textDark
-        return l
-    }()
-
-    private lazy var subtitleLabel: UILabel = {
-        let l = UILabel()
-        l.text = "Расскажи о своём дне"
-        l.font = .systemFont(ofSize: 15, weight: .regular)
-        l.textAlignment = .center
-        l.textColor = textMid
-        return l
-    }()
-
-    // Mood
-    private lazy var moodCard: UIView = makeCard()
-    private lazy var moodQuestionLabel: UILabel = {
-        let l = UILabel()
-        l.text = "Как оцените свой день?"
-        l.font = .systemFont(ofSize: 15, weight: .semibold)
-        l.textColor = textDark
-        l.textAlignment = .center
-        return l
-    }()
     private let moodStack = UIStackView()
     private var moodButtons: [UIButton] = []
-
-    // Entry
-    private lazy var entryCard: UIView = makeCard()
-    private lazy var entryLabel: UILabel = makeSectionLabel("Запись дня")
     private lazy var textView: UITextView = {
         let tv = UITextView()
         tv.font = .systemFont(ofSize: 15)
         tv.textColor = textDark
-        tv.backgroundColor = UIColor(red: 0.95, green: 0.91, blue: 0.85, alpha: 1)
+        tv.backgroundColor = UIColor(red: 0.92, green: 0.90, blue: 0.87, alpha: 1.0)
         tv.layer.cornerRadius = 14
         tv.layer.borderWidth = 1.5
         tv.layer.borderColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 1).cgColor
@@ -86,10 +49,6 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         tv.isScrollEnabled = false
         return tv
     }()
-
-    // Color
-    private lazy var colorCard: UIView = makeCard()
-    private lazy var colorLabel: UILabel = makeSectionLabel("Цвет дня")
     private let colorScrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.showsHorizontalScrollIndicator = false
@@ -104,10 +63,6 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return s
     }()
     private var colorButtons: [UIButton] = []
-
-    // Tags
-    private lazy var tagsCard: UIView = makeCard()
-    private lazy var tagsLabel: UILabel = makeSectionLabel("Теги")
     private let tagsScrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.showsHorizontalScrollIndicator = false
@@ -122,9 +77,6 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         return s
     }()
     private var tagButtons: [UIButton] = []
-
-    // Photo
-    private lazy var photoCard: UIView = makeCard()
     private lazy var photoImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
@@ -135,20 +87,12 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     }()
     private lazy var addPhotoButton: UIButton = {
         let btn = UIButton(type: .system)
-        // icon + text stack
-        let iconLabel = UILabel()
-        iconLabel.text = "📷"
-        iconLabel.font = .systemFont(ofSize: 28)
-        iconLabel.textAlignment = .center
-
         btn.setTitle("Добавить фото дня", for: .normal)
         btn.setTitleColor(textMid, for: .normal)
         btn.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
         btn.backgroundColor = .clear
         return btn
     }()
-
-    // Save
     private lazy var saveButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitle("Сохранить", for: .normal)
@@ -165,25 +109,45 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         view.backgroundColor = pageBg
         loadTags()
         currentColors = loadSavedColors()
-        if currentColors.isEmpty {
-            currentColors = defaultColors
-            saveColors(currentColors)
-        }
+        if currentColors.isEmpty { currentColors = defaultColors; saveColors(currentColors) }
         setupUI()
         setupMoodButtons()
         setupColorButtons()
         setupTagButtons()
     }
 
-    // MARK: - Helpers
-    private func makeCard() -> UIView {
+    // MARK: - Floral card helper (FIX 3: все белые карточки с floral)
+    private func makeFloralCard() -> UIView {
         let v = UIView()
-        v.backgroundColor = cardBg
         v.layer.cornerRadius = 22
         v.layer.shadowColor = UIColor.black.cgColor
         v.layer.shadowOpacity = 0.04
         v.layer.shadowOffset = CGSize(width: 0, height: 2)
         v.layer.shadowRadius = 6
+        v.clipsToBounds = true
+
+        if let orig = UIImage(named: "floral_pattern") {
+            let sz = CGSize(width: orig.size.width / 2.5, height: orig.size.height / 2.5)
+            UIGraphicsBeginImageContextWithOptions(sz, false, 0)
+            orig.draw(in: CGRect(origin: .zero, size: sz))
+            let scaled = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            v.backgroundColor = UIColor(patternImage: scaled ?? orig)
+        } else {
+            v.backgroundColor = .white
+        }
+
+        let overlay = UIView()
+        overlay.backgroundColor = .white
+        overlay.alpha = 0.82
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        v.addSubview(overlay)
+        NSLayoutConstraint.activate([
+            overlay.topAnchor.constraint(equalTo: v.topAnchor),
+            overlay.leadingAnchor.constraint(equalTo: v.leadingAnchor),
+            overlay.trailingAnchor.constraint(equalTo: v.trailingAnchor),
+            overlay.bottomAnchor.constraint(equalTo: v.bottomAnchor)
+        ])
         return v
     }
 
@@ -211,52 +175,90 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
 
-        // ── Header ──
-        let headerStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        // FIX 4: дата + заголовок + подзаголовок + разделитель
+        let dateLabel = UILabel()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "EEEE, d MMMM"
+        let raw = formatter.string(from: Date())
+        dateLabel.text = raw.prefix(1).uppercased() + raw.dropFirst()
+        dateLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        dateLabel.textColor = textMid.withAlphaComponent(0.7)
+        dateLabel.textAlignment = .center
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Мой дневник"
+        titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
+        titleLabel.textAlignment = .center
+        titleLabel.textColor = textDark
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = "Расскажи о своём дне"
+        subtitleLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        subtitleLabel.textAlignment = .center
+        subtitleLabel.textColor = textMid
+
+        let headerDivider = UIView()
+        headerDivider.backgroundColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 0.2)
+        headerDivider.translatesAutoresizingMaskIntoConstraints = false
+        headerDivider.heightAnchor.constraint(equalToConstant: 1).isActive = true
+
+        let headerStack = UIStackView(arrangedSubviews: [dateLabel, titleLabel, subtitleLabel, headerDivider])
         headerStack.axis = .vertical
         headerStack.spacing = 4
+        headerStack.setCustomSpacing(14, after: subtitleLabel)
 
-        // ── Mood card ──
-        moodCard.addSubview(moodQuestionLabel)
-        moodCard.addSubview(moodStack)
-        moodQuestionLabel.translatesAutoresizingMaskIntoConstraints = false
+        // ── Mood card (floral) ──
+        let moodCard = makeFloralCard()
+        let moodQuestion = UILabel()
+        moodQuestion.text = "Как оцените свой день?"
+        moodQuestion.font = .systemFont(ofSize: 15, weight: .semibold)
+        moodQuestion.textColor = textDark
+        moodQuestion.textAlignment = .center
+        moodQuestion.translatesAutoresizingMaskIntoConstraints = false
         moodStack.translatesAutoresizingMaskIntoConstraints = false
+        moodCard.addSubview(moodQuestion)
+        moodCard.addSubview(moodStack)
         NSLayoutConstraint.activate([
-            moodQuestionLabel.topAnchor.constraint(equalTo: moodCard.topAnchor, constant: 18),
-            moodQuestionLabel.centerXAnchor.constraint(equalTo: moodCard.centerXAnchor),
-            moodStack.topAnchor.constraint(equalTo: moodQuestionLabel.bottomAnchor, constant: 14),
+            moodQuestion.topAnchor.constraint(equalTo: moodCard.topAnchor, constant: 18),
+            moodQuestion.centerXAnchor.constraint(equalTo: moodCard.centerXAnchor),
+            moodStack.topAnchor.constraint(equalTo: moodQuestion.bottomAnchor, constant: 14),
             moodStack.leadingAnchor.constraint(equalTo: moodCard.leadingAnchor, constant: 20),
             moodStack.trailingAnchor.constraint(equalTo: moodCard.trailingAnchor, constant: -20),
             moodStack.bottomAnchor.constraint(equalTo: moodCard.bottomAnchor, constant: -18),
             moodStack.heightAnchor.constraint(equalToConstant: 56)
         ])
 
-        // ── Entry card ──
-        entryCard.addSubview(entryLabel)
-        entryCard.addSubview(textView)
-        entryLabel.translatesAutoresizingMaskIntoConstraints = false
+        // ── Entry card (floral) ──
+        let entryCard = makeFloralCard()
+        let entryLbl = makeSectionLabel("Запись дня")
+        entryLbl.translatesAutoresizingMaskIntoConstraints = false
         textView.translatesAutoresizingMaskIntoConstraints = false
+        entryCard.addSubview(entryLbl)
+        entryCard.addSubview(textView)
         NSLayoutConstraint.activate([
-            entryLabel.topAnchor.constraint(equalTo: entryCard.topAnchor, constant: 18),
-            entryLabel.leadingAnchor.constraint(equalTo: entryCard.leadingAnchor, constant: 20),
-            textView.topAnchor.constraint(equalTo: entryLabel.bottomAnchor, constant: 10),
+            entryLbl.topAnchor.constraint(equalTo: entryCard.topAnchor, constant: 18),
+            entryLbl.leadingAnchor.constraint(equalTo: entryCard.leadingAnchor, constant: 20),
+            textView.topAnchor.constraint(equalTo: entryLbl.bottomAnchor, constant: 10),
             textView.leadingAnchor.constraint(equalTo: entryCard.leadingAnchor, constant: 16),
             textView.trailingAnchor.constraint(equalTo: entryCard.trailingAnchor, constant: -16),
             textView.bottomAnchor.constraint(equalTo: entryCard.bottomAnchor, constant: -16),
             textView.heightAnchor.constraint(greaterThanOrEqualToConstant: 120)
         ])
 
-        // ── Color card ──
-        colorCard.addSubview(colorLabel)
-        colorCard.addSubview(colorScrollView)
-        colorScrollView.addSubview(colorStack)
-        colorLabel.translatesAutoresizingMaskIntoConstraints = false
+        // ── Color card (floral) ──
+        let colorCard = makeFloralCard()
+        let colorLbl = makeSectionLabel("Цвет дня")
+        colorLbl.translatesAutoresizingMaskIntoConstraints = false
         colorScrollView.translatesAutoresizingMaskIntoConstraints = false
         colorStack.translatesAutoresizingMaskIntoConstraints = false
+        colorScrollView.addSubview(colorStack)
+        colorCard.addSubview(colorLbl)
+        colorCard.addSubview(colorScrollView)
         NSLayoutConstraint.activate([
-            colorLabel.topAnchor.constraint(equalTo: colorCard.topAnchor, constant: 18),
-            colorLabel.leadingAnchor.constraint(equalTo: colorCard.leadingAnchor, constant: 20),
-            colorScrollView.topAnchor.constraint(equalTo: colorLabel.bottomAnchor, constant: 12),
+            colorLbl.topAnchor.constraint(equalTo: colorCard.topAnchor, constant: 18),
+            colorLbl.leadingAnchor.constraint(equalTo: colorCard.leadingAnchor, constant: 20),
+            colorScrollView.topAnchor.constraint(equalTo: colorLbl.bottomAnchor, constant: 12),
             colorScrollView.leadingAnchor.constraint(equalTo: colorCard.leadingAnchor, constant: 20),
             colorScrollView.trailingAnchor.constraint(equalTo: colorCard.trailingAnchor, constant: -20),
             colorScrollView.bottomAnchor.constraint(equalTo: colorCard.bottomAnchor, constant: -18),
@@ -268,17 +270,19 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             colorStack.heightAnchor.constraint(equalTo: colorScrollView.frameLayoutGuide.heightAnchor)
         ])
 
-        // ── Tags card ──
-        tagsCard.addSubview(tagsLabel)
-        tagsCard.addSubview(tagsScrollView)
-        tagsScrollView.addSubview(tagsStack)
-        tagsLabel.translatesAutoresizingMaskIntoConstraints = false
+        // ── Tags card (floral) ──
+        let tagsCard = makeFloralCard()
+        let tagsLbl = makeSectionLabel("Теги")
+        tagsLbl.translatesAutoresizingMaskIntoConstraints = false
         tagsScrollView.translatesAutoresizingMaskIntoConstraints = false
         tagsStack.translatesAutoresizingMaskIntoConstraints = false
+        tagsScrollView.addSubview(tagsStack)
+        tagsCard.addSubview(tagsLbl)
+        tagsCard.addSubview(tagsScrollView)
         NSLayoutConstraint.activate([
-            tagsLabel.topAnchor.constraint(equalTo: tagsCard.topAnchor, constant: 18),
-            tagsLabel.leadingAnchor.constraint(equalTo: tagsCard.leadingAnchor, constant: 20),
-            tagsScrollView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 12),
+            tagsLbl.topAnchor.constraint(equalTo: tagsCard.topAnchor, constant: 18),
+            tagsLbl.leadingAnchor.constraint(equalTo: tagsCard.leadingAnchor, constant: 20),
+            tagsScrollView.topAnchor.constraint(equalTo: tagsLbl.bottomAnchor, constant: 12),
             tagsScrollView.leadingAnchor.constraint(equalTo: tagsCard.leadingAnchor, constant: 20),
             tagsScrollView.trailingAnchor.constraint(equalTo: tagsCard.trailingAnchor, constant: -20),
             tagsScrollView.bottomAnchor.constraint(equalTo: tagsCard.bottomAnchor, constant: -18),
@@ -290,35 +294,25 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
             tagsStack.heightAnchor.constraint(equalTo: tagsScrollView.frameLayoutGuide.heightAnchor)
         ])
 
-        // ── Photo card ──
-        // Dashed drop zone inside photo card
+        // ── Photo card (floral) ──
+        let photoCard = makeFloralCard()
         let dropZone = UIView()
-        dropZone.backgroundColor = UIColor(red: 0.94, green: 0.90, blue: 0.84, alpha: 1)
+        dropZone.backgroundColor = UIColor(red: 0.92, green: 0.90, blue: 0.87, alpha: 1.0)
         dropZone.layer.cornerRadius = 16
-        photoCard.addSubview(dropZone)
         dropZone.translatesAutoresizingMaskIntoConstraints = false
+        photoCard.addSubview(dropZone)
 
-        // Dashed border
         let dash = CAShapeLayer()
         dash.strokeColor = UIColor(red: 0.65, green: 0.55, blue: 0.44, alpha: 1).cgColor
         dash.fillColor = UIColor.clear.cgColor
         dash.lineWidth = 1.5
         dash.lineDashPattern = [6, 4]
-        dash.frame = CGRect(x: 0, y: 0, width: 1, height: 1) // updated in layoutSubviews
         dropZone.layer.addSublayer(dash)
-
-        // Update dash path after layout
         DispatchQueue.main.async {
             dash.frame = dropZone.bounds
             dash.path = UIBezierPath(roundedRect: dropZone.bounds, cornerRadius: 16).cgPath
         }
 
-        photoCard.addSubview(photoImageView)
-        photoCard.addSubview(addPhotoButton)
-        photoImageView.translatesAutoresizingMaskIntoConstraints = false
-        addPhotoButton.translatesAutoresizingMaskIntoConstraints = false
-
-        // Camera icon label in centre of drop zone
         let cameraIcon = UILabel()
         cameraIcon.text = "📷"
         cameraIcon.font = .systemFont(ofSize: 30)
@@ -326,21 +320,23 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         cameraIcon.translatesAutoresizingMaskIntoConstraints = false
         dropZone.addSubview(cameraIcon)
 
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        addPhotoButton.translatesAutoresizingMaskIntoConstraints = false
+        dropZone.addSubview(photoImageView)
+        dropZone.addSubview(addPhotoButton)
+
         NSLayoutConstraint.activate([
             dropZone.topAnchor.constraint(equalTo: photoCard.topAnchor, constant: 16),
             dropZone.leadingAnchor.constraint(equalTo: photoCard.leadingAnchor, constant: 16),
             dropZone.trailingAnchor.constraint(equalTo: photoCard.trailingAnchor, constant: -16),
             dropZone.bottomAnchor.constraint(equalTo: photoCard.bottomAnchor, constant: -16),
             photoCard.heightAnchor.constraint(equalToConstant: 180),
-
             cameraIcon.centerXAnchor.constraint(equalTo: dropZone.centerXAnchor),
             cameraIcon.centerYAnchor.constraint(equalTo: dropZone.centerYAnchor, constant: -16),
-
             photoImageView.topAnchor.constraint(equalTo: dropZone.topAnchor),
             photoImageView.leadingAnchor.constraint(equalTo: dropZone.leadingAnchor),
             photoImageView.trailingAnchor.constraint(equalTo: dropZone.trailingAnchor),
             photoImageView.bottomAnchor.constraint(equalTo: dropZone.bottomAnchor),
-
             addPhotoButton.centerXAnchor.constraint(equalTo: dropZone.centerXAnchor),
             addPhotoButton.bottomAnchor.constraint(equalTo: dropZone.bottomAnchor, constant: -14),
             addPhotoButton.heightAnchor.constraint(equalToConstant: 36),
@@ -350,11 +346,7 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         // ── Main stack ──
         let mainStack = UIStackView(arrangedSubviews: [
             headerStack,
-            moodCard,
-            entryCard,
-            colorCard,
-            tagsCard,
-            photoCard,
+            moodCard, entryCard, colorCard, tagsCard, photoCard,
             saveButton
         ])
         mainStack.axis = .vertical
@@ -383,7 +375,6 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         let moods: [(String, String)] = [
             ("😄", "Отлично"), ("🙂", "Хорошо"), ("😐", "Нормально"), ("😔", "Грустно")
         ]
-
         for mood in moods {
             let col = UIStackView()
             col.axis = .vertical
@@ -429,14 +420,12 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
     private func setupColorButtons() {
         colorStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         colorButtons.removeAll()
-
         let size: CGFloat = 40
         for color in currentColors {
             let btn = createColorButton(color: color, size: size)
             colorButtons.append(btn)
             colorStack.addArrangedSubview(btn)
         }
-
         let addBtn = makeAddButton(size: size)
         addBtn.addTarget(self, action: #selector(addNewColorTapped), for: .touchUpInside)
         colorStack.addArrangedSubview(addBtn)
@@ -631,7 +620,10 @@ class JournalViewController: UIViewController, UIImagePickerControllerDelegate, 
         textView.text = ""
         photoImageView.image = nil
         addPhotoButton.isHidden = false
-        moodButtons.forEach { $0.backgroundColor = UIColor(red: 0.96, green: 0.93, blue: 0.89, alpha: 1); $0.layer.borderColor = UIColor.clear.cgColor }
+        moodButtons.forEach {
+            $0.backgroundColor = UIColor(red: 0.96, green: 0.93, blue: 0.89, alpha: 1)
+            $0.layer.borderColor = UIColor.clear.cgColor
+        }
         selectedMood = nil
         colorButtons.forEach { $0.layer.borderColor = UIColor.clear.cgColor }
         selectedColor = nil

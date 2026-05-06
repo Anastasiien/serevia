@@ -1,24 +1,16 @@
 import UIKit
 
-// MARK: - UIColor из HEX
 extension UIColor {
     static func fromHex(_ hex: String) -> UIColor? {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-
+        var h = hex.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "#", with: "")
         var rgb: UInt64 = 0
-        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else { return nil }
-
-        let r, g, b: CGFloat
-        if hexSanitized.count == 6 {
-            r = CGFloat((rgb & 0xFF0000) >> 16) / 255
-            g = CGFloat((rgb & 0x00FF00) >> 8) / 255
-            b = CGFloat(rgb & 0x0000FF) / 255
-        } else {
-            return nil
-        }
-
-        return UIColor(red: r, green: g, blue: b, alpha: 1)
+        guard Scanner(string: h).scanHexInt64(&rgb), h.count == 6 else { return nil }
+        return UIColor(
+            red:   CGFloat((rgb & 0xFF0000) >> 16) / 255,
+            green: CGFloat((rgb & 0x00FF00) >> 8)  / 255,
+            blue:  CGFloat(rgb & 0x0000FF)          / 255,
+            alpha: 1
+        )
     }
 }
 
@@ -26,40 +18,74 @@ class DiaryDetailViewController: UIViewController {
 
     private let entry: DiaryEntry
 
+    private let accent   = UIColor(red: 0.58, green: 0.46, blue: 0.42, alpha: 1)
+    private let pageBg   = UIColor(red: 0.96, green: 0.94, blue: 0.91, alpha: 1)
+    private let textDark = UIColor(red: 0.20, green: 0.15, blue: 0.10, alpha: 1)
+    private let textMid  = UIColor(red: 0.48, green: 0.40, blue: 0.32, alpha: 1)
+    private let cardBg   = UIColor.white
+
     init(entry: DiaryEntry) {
         self.entry = entry
         super.init(nibName: nil, bundle: nil)
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) не реализован")
-    }
+    required init?(coder: NSCoder) { fatalError() }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 0.95, green: 0.93, blue: 0.88, alpha: 1.0)
+        view.backgroundColor = pageBg
         setupUI()
     }
 
-    private func setupUI() {
-        view.backgroundColor = UIColor(red: 0.95, green: 0.93, blue: 0.88, alpha: 1.0)
+    // floral карточка — единый стиль
+    private func makeFloralCard() -> UIView {
+        let v = UIView()
+        v.layer.cornerRadius = 22
+        v.layer.shadowColor = UIColor.black.cgColor
+        v.layer.shadowOpacity = 0.04
+        v.layer.shadowOffset = CGSize(width: 0, height: 2)
+        v.layer.shadowRadius = 6
+        v.clipsToBounds = true
 
-        // MARK: - ScrollView
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.showsVerticalScrollIndicator = true
-        view.addSubview(scrollView)
+        if let orig = UIImage(named: "floral_pattern") {
+            let sz = CGSize(width: orig.size.width / 2.5, height: orig.size.height / 2.5)
+            UIGraphicsBeginImageContextWithOptions(sz, false, 0)
+            orig.draw(in: CGRect(origin: .zero, size: sz))
+            let scaled = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            v.backgroundColor = UIColor(patternImage: scaled ?? orig)
+        } else {
+            v.backgroundColor = cardBg
+        }
+
+        let overlay = UIView()
+        overlay.backgroundColor = cardBg
+        overlay.alpha = 0.82
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        v.addSubview(overlay)
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            overlay.topAnchor.constraint(equalTo: v.topAnchor),
+            overlay.leadingAnchor.constraint(equalTo: v.leadingAnchor),
+            overlay.trailingAnchor.constraint(equalTo: v.trailingAnchor),
+            overlay.bottomAnchor.constraint(equalTo: v.bottomAnchor)
         ])
+        return v
+    }
+
+    private func setupUI() {
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
 
         let contentView = UIView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
+
         NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -67,87 +93,104 @@ class DiaryDetailViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
 
-        // MARK: - Основной стек
-        let mainStack = UIStackView()
-        mainStack.axis = .vertical
-        mainStack.spacing = 24
-        mainStack.alignment = .fill
-        mainStack.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(mainStack)
-        NSLayoutConstraint.activate([
-            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
-        ])
+        // ── заголовок в едином стиле ──
+        let dateTopLabel = UILabel()
+        let topFormatter = DateFormatter()
+        topFormatter.locale = Locale(identifier: "ru_RU")
+        topFormatter.dateFormat = "EEEE, d MMMM yyyy"
+        let raw = topFormatter.string(from: entry.date)
+        dateTopLabel.text = raw.prefix(1).uppercased() + raw.dropFirst()
+        dateTopLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        dateTopLabel.textColor = textMid.withAlphaComponent(0.7)
+        dateTopLabel.textAlignment = .center
 
-        // MARK: - Дата
-        let dateLabel = UILabel()
-        dateLabel.font = UIFont(name: "Georgia-Italic", size: 26)
-        dateLabel.textColor = UIColor(red: 0.36, green: 0.29, blue: 0.22, alpha: 1.0)
-        dateLabel.textAlignment = .center
+        let titleLabel = UILabel()
+        titleLabel.text = "Запись дня"
+        titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
+        titleLabel.textColor = textDark
+        titleLabel.textAlignment = .center
 
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
-        formatter.dateFormat = "d MMMM yyyy"
-        dateLabel.text = formatter.string(from: entry.date)
+        let divider = UIView()
+        divider.backgroundColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 0.2)
+        divider.translatesAutoresizingMaskIntoConstraints = false
+        divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
 
-        // MARK: - Цвет и эмоция
-        let colorView = UIView()
-        colorView.layer.cornerRadius = 16
-        colorView.layer.borderWidth = 1
-        colorView.layer.borderColor = UIColor(white: 0.8, alpha: 1).cgColor
-        colorView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            colorView.widthAnchor.constraint(equalToConstant: 32),
-            colorView.heightAnchor.constraint(equalToConstant: 32)
-        ])
+        let headerStack = UIStackView(arrangedSubviews: [dateTopLabel, titleLabel, divider])
+        headerStack.axis = .vertical
+        headerStack.spacing = 4
+        headerStack.setCustomSpacing(14, after: titleLabel)
+
+        // ── карточка: настроение + цвет дня ──
+        let moodCard = makeFloralCard()
+
+        let moodBigLabel = UILabel()
+        moodBigLabel.text = entry.mood
+        moodBigLabel.font = .systemFont(ofSize: 44)
+        moodBigLabel.textAlignment = .center
+
+        let moodTextLabel = UILabel()
+        moodTextLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        moodTextLabel.textColor = textMid
+        moodTextLabel.textAlignment = .center
+        let moodMap = ["😄": "Отлично", "🙂": "Хорошо", "😐": "Нормально", "😔": "Грустно"]
+        moodTextLabel.text = moodMap[entry.mood] ?? "Настроение"
+
+        var moodCardArranged: [UIView] = [moodBigLabel, moodTextLabel]
+
         if let hex = entry.color, let uiColor = UIColor.fromHex(hex) {
-            colorView.backgroundColor = uiColor
+            let colorRow = UIStackView()
+            colorRow.axis = .horizontal
+            colorRow.spacing = 10
+            colorRow.alignment = .center
+
+            let colorDot = UIView()
+            colorDot.backgroundColor = uiColor
+            colorDot.layer.cornerRadius = 10
+            colorDot.translatesAutoresizingMaskIntoConstraints = false
+            colorDot.widthAnchor.constraint(equalToConstant: 20).isActive = true
+            colorDot.heightAnchor.constraint(equalToConstant: 20).isActive = true
+
+            let colorLbl = UILabel()
+            colorLbl.text = "Цвет дня"
+            colorLbl.font = .systemFont(ofSize: 13, weight: .medium)
+            colorLbl.textColor = textMid
+
+            colorRow.addArrangedSubview(colorDot)
+            colorRow.addArrangedSubview(colorLbl)
+            moodCardArranged.append(colorRow)
         }
 
-        let moodLabel = UILabel()
-        moodLabel.font = UIFont.systemFont(ofSize: 36)
-        moodLabel.text = entry.mood
-
-        let colorTextLabel = UILabel()
-        colorTextLabel.text = "Цвет:"
-        colorTextLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        colorTextLabel.textColor = UIColor(red: 0.67, green: 0.55, blue: 0.42, alpha: 1.0)
-
-        let emotionTextLabel = UILabel()
-        emotionTextLabel.text = "Эмоция:"
-        emotionTextLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        emotionTextLabel.textColor = UIColor(red: 0.67, green: 0.55, blue: 0.42, alpha: 1.0)
-
-        let emotionStack = UIStackView(arrangedSubviews: [
-            colorTextLabel, colorView,
-            emotionTextLabel, moodLabel
+        let moodInner = UIStackView(arrangedSubviews: moodCardArranged)
+        moodInner.axis = .vertical
+        moodInner.alignment = .center
+        moodInner.spacing = 6
+        moodInner.translatesAutoresizingMaskIntoConstraints = false
+        moodCard.addSubview(moodInner)
+        NSLayoutConstraint.activate([
+            moodInner.topAnchor.constraint(equalTo: moodCard.topAnchor, constant: 20),
+            moodInner.leadingAnchor.constraint(equalTo: moodCard.leadingAnchor, constant: 20),
+            moodInner.trailingAnchor.constraint(equalTo: moodCard.trailingAnchor, constant: -20),
+            moodInner.bottomAnchor.constraint(equalTo: moodCard.bottomAnchor, constant: -20)
         ])
-        emotionStack.axis = .horizontal
-        emotionStack.spacing = 20
-        emotionStack.alignment = .center
 
-        let infoCard = UIStackView(arrangedSubviews: [dateLabel, emotionStack])
-        infoCard.axis = .vertical
-        infoCard.spacing = 12
-        infoCard.alignment = .center
-        infoCard.backgroundColor = UIColor(red: 0.99, green: 0.985, blue: 0.98, alpha: 1.0)
-        infoCard.layer.cornerRadius = 16
-        infoCard.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        infoCard.isLayoutMarginsRelativeArrangement = true
-        mainStack.addArrangedSubview(infoCard)
-
-        // MARK: - Теги с горизонтальным скроллом
+        // ── карточка: теги ──
+        var tagsCard: UIView? = nil
         if !entry.tags.isEmpty {
+            let card = makeFloralCard()
+
+            let tagsTitle = UILabel()
+            tagsTitle.text = "Теги"
+            tagsTitle.font = .systemFont(ofSize: 13, weight: .semibold)
+            tagsTitle.textColor = textMid
+
             let tagsScroll = UIScrollView()
             tagsScroll.showsHorizontalScrollIndicator = false
             tagsScroll.translatesAutoresizingMaskIntoConstraints = false
+
             let tagsStack = UIStackView()
             tagsStack.axis = .horizontal
             tagsStack.spacing = 8
             tagsStack.alignment = .center
-            tagsStack.distribution = .fillProportionally
             tagsStack.translatesAutoresizingMaskIntoConstraints = false
             tagsScroll.addSubview(tagsStack)
             NSLayoutConstraint.activate([
@@ -157,71 +200,124 @@ class DiaryDetailViewController: UIViewController {
                 tagsStack.trailingAnchor.constraint(equalTo: tagsScroll.trailingAnchor),
                 tagsStack.heightAnchor.constraint(equalTo: tagsScroll.heightAnchor)
             ])
+
             for tag in entry.tags {
-                let label = UILabel()
-                label.text = "#\(tag)"
-                label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-                label.textColor = UIColor(red: 0.45, green: 0.36, blue: 0.28, alpha: 1.0)
-                label.textAlignment = .center
-                label.isUserInteractionEnabled = false
+                let lbl = UILabel()
+                lbl.text = "#\(tag)"
+                lbl.font = .systemFont(ofSize: 13, weight: .medium)
+                lbl.textColor = accent
+                lbl.textAlignment = .center
 
-                let container = UIView()
-                container.backgroundColor = UIColor(red: 0.93, green: 0.89, blue: 0.82, alpha: 1.0)
-                container.layer.cornerRadius = 14
-                container.clipsToBounds = true
-                container.addSubview(label)
-
-                label.translatesAutoresizingMaskIntoConstraints = false
+                let pill = UIView()
+                pill.backgroundColor = UIColor(red: 0.88, green: 0.85, blue: 0.81, alpha: 1)
+                pill.layer.cornerRadius = 13
+                pill.clipsToBounds = true
+                lbl.translatesAutoresizingMaskIntoConstraints = false
+                pill.addSubview(lbl)
                 NSLayoutConstraint.activate([
-                    label.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
-                    label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6),
-                    label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
-                    label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
+                    lbl.topAnchor.constraint(equalTo: pill.topAnchor, constant: 5),
+                    lbl.bottomAnchor.constraint(equalTo: pill.bottomAnchor, constant: -5),
+                    lbl.leadingAnchor.constraint(equalTo: pill.leadingAnchor, constant: 12),
+                    lbl.trailingAnchor.constraint(equalTo: pill.trailingAnchor, constant: -12)
                 ])
-                tagsStack.addArrangedSubview(container)
+                tagsStack.addArrangedSubview(pill)
             }
-            mainStack.addArrangedSubview(tagsScroll)
+
+            let inner = UIStackView(arrangedSubviews: [tagsTitle, tagsScroll])
+            inner.axis = .vertical
+            inner.spacing = 10
+            inner.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(inner)
+            NSLayoutConstraint.activate([
+                inner.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
+                inner.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 20),
+                inner.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -20),
+                inner.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18),
+                tagsScroll.heightAnchor.constraint(equalToConstant: 32)
+            ])
+            tagsCard = card
         }
 
-        // MARK: - Картинка (если есть)
-        if let imageData = entry.imageData, let image = UIImage(data: imageData) {
-            let imageView = UIImageView(image: image)
-            imageView.contentMode = .scaleAspectFit
-            imageView.layer.cornerRadius = 12
-            imageView.clipsToBounds = true
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-
-            mainStack.addArrangedSubview(imageView)
-
-            // Ограничиваем максимальную высоту
-            imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 300).isActive = true
-        }
-
-
-
-        // MARK: - Текст
+        // ── карточка: текст ──
+        var textCard: UIView? = nil
         if !entry.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let card = makeFloralCard()
+
+            let textTitle = UILabel()
+            textTitle.text = "Запись"
+            textTitle.font = .systemFont(ofSize: 13, weight: .semibold)
+            textTitle.textColor = textMid
+
             let textLabel = UILabel()
-            textLabel.font = UIFont.systemFont(ofSize: 16)
-            textLabel.textColor = UIColor(red: 0.25, green: 0.20, blue: 0.15, alpha: 1.0)
+            textLabel.font = .systemFont(ofSize: 15)
+            textLabel.textColor = textDark
             textLabel.numberOfLines = 0
             textLabel.text = entry.text
 
-            let textContainer = UIView()
-            textContainer.backgroundColor = UIColor(red: 0.90, green: 0.85, blue: 0.78, alpha: 1.0)
-            textContainer.layer.cornerRadius = 12
-            textContainer.addSubview(textLabel)
-
-            textLabel.translatesAutoresizingMaskIntoConstraints = false
+            let inner = UIStackView(arrangedSubviews: [textTitle, textLabel])
+            inner.axis = .vertical
+            inner.spacing = 10
+            inner.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(inner)
             NSLayoutConstraint.activate([
-                textLabel.topAnchor.constraint(equalTo: textContainer.topAnchor, constant: 16),
-                textLabel.leadingAnchor.constraint(equalTo: textContainer.leadingAnchor, constant: 16),
-                textLabel.trailingAnchor.constraint(equalTo: textContainer.trailingAnchor, constant: -16),
-                textLabel.bottomAnchor.constraint(equalTo: textContainer.bottomAnchor, constant: -16)
+                inner.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
+                inner.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 20),
+                inner.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -20),
+                inner.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18)
             ])
-
-            mainStack.addArrangedSubview(textContainer)
+            textCard = card
         }
-    }
 
+        // ── карточка: фото ──
+        var photoCard: UIView? = nil
+        if let imageData = entry.imageData, let image = UIImage(data: imageData) {
+            let card = makeFloralCard()
+
+            let photoTitle = UILabel()
+            photoTitle.text = "Фото дня"
+            photoTitle.font = .systemFont(ofSize: 13, weight: .semibold)
+            photoTitle.textColor = textMid
+
+            let iv = UIImageView(image: image)
+            iv.contentMode = .scaleAspectFit
+            iv.layer.cornerRadius = 14
+            iv.clipsToBounds = true
+            iv.translatesAutoresizingMaskIntoConstraints = false
+            iv.heightAnchor.constraint(lessThanOrEqualToConstant: 280).isActive = true
+
+            let inner = UIStackView(arrangedSubviews: [photoTitle, iv])
+            inner.axis = .vertical
+            inner.spacing = 10
+            inner.translatesAutoresizingMaskIntoConstraints = false
+            card.addSubview(inner)
+            NSLayoutConstraint.activate([
+                inner.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
+                inner.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 20),
+                inner.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -20),
+                inner.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18)
+            ])
+            photoCard = card
+        }
+
+        // ── собираем главный стек ──
+        var arranged: [UIView] = [headerStack, moodCard]
+        if let t = tagsCard  { arranged.append(t) }
+        if let t = textCard  { arranged.append(t) }
+        if let p = photoCard { arranged.append(p) }
+
+        let mainStack = UIStackView(arrangedSubviews: arranged)
+        mainStack.axis = .vertical
+        mainStack.spacing = 16
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        mainStack.isLayoutMarginsRelativeArrangement = true
+        mainStack.layoutMargins = UIEdgeInsets(top: 12, left: 20, bottom: 32, right: 20)
+        contentView.addSubview(mainStack)
+
+        NSLayoutConstraint.activate([
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+    }
 }
