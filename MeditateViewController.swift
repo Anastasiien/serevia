@@ -6,11 +6,19 @@ class MeditateViewController: UIViewController {
     // MARK: - Properties
     private var currentMeditation: MeditationAudio?
     private var isMeditationRunning = false
+    private var isTimerSessionActive = false  // флаг: таймер запущен — блокирует практики
     private var initialMeditationSeconds = 0
     private var selectedTime: Int = 10
     private var timer: Timer?
     private var remainingSeconds = 0
-    private var favorites: Set<String> = []
+    private var favorites: Set<String> = {
+        let saved = UserDefaults.standard.stringArray(forKey: "meditation_favorites") ?? []
+        return Set(saved)
+    }() {
+        didSet {
+            UserDefaults.standard.set(Array(favorites), forKey: "meditation_favorites")
+        }
+    }
     private var audioPlayer: AVAudioPlayer?
 
     private enum Sound: String, CaseIterable {
@@ -404,12 +412,17 @@ class MeditateViewController: UIViewController {
 
     @objc private func startButtonTapped() {
         if startButton.title(for: .normal) == "Начать" {
+            // блокируем таймер если активна практика
+            let isMeditationActive = (activeMeditationTimer != nil) || (currentMeditation != nil && activeMeditationSeconds > 0)
+            if isMeditationActive { return }
+
             if remainingSeconds > 0 {
                 startTimerResume()
                 playSound(for: selectedSound)
             } else {
                 startMeditation()
             }
+            isTimerSessionActive = true
             startButton.setTitle("Отменить", for: .normal)
             stopButton.isHidden = false
             stopButton.setTitle("Остановить", for: .normal)
@@ -421,6 +434,7 @@ class MeditateViewController: UIViewController {
             selectedTime = 1
             durationSlider.value = 1
             timerLabel.text = "1 мин"
+            isTimerSessionActive = false
             startButton.setTitle("Начать", for: .normal)
             stopButton.isHidden = true
             unlockControls()
@@ -468,6 +482,7 @@ class MeditateViewController: UIViewController {
                 self.startButton.setTitle("Начать", for: .normal)
                 self.stopButton.isHidden = true
                 self.stopSound()
+                self.isTimerSessionActive = false
                 self.unlockControls()
             }
         }
@@ -587,6 +602,9 @@ class MeditateViewController: UIViewController {
         cancelButton: UIButton,
         durationLabel: UILabel
     ) {
+        // блокируем запуск практики если активен таймер сеанса
+        if isTimerSessionActive { return }
+
         // блокируем запуск другой медитации пока идёт воспроизведение ИЛИ пауза
         let isActiveSession = (activeMeditationTimer != nil) || (currentMeditation != nil && !isMeditationRunning && activeMeditationSeconds > 0)
         if isActiveSession && currentMeditation != meditation.audio { return }
