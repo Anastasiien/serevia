@@ -22,21 +22,43 @@ class MainTabBarController: UITabBarController {
         let journalVC = UINavigationController(rootViewController: JournalViewController())
         let exploreVC = UINavigationController(rootViewController: ExploreViewController())
 
-        homeVC.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
-        meditateVC.tabBarItem = UITabBarItem(title: "Meditate", image: UIImage(systemName: "apple.meditate"), tag: 1)
-        aiVC.tabBarItem = UITabBarItem(title: "AI", image: UIImage(systemName: "sparkles"), tag: 2)
-        journalVC.tabBarItem = UITabBarItem(title: "Journal", image: UIImage(systemName: "book"), tag: 3)
-        exploreVC.tabBarItem = UITabBarItem(title: "Explore", image: UIImage(systemName: "leaf"), tag: 4)
+        homeVC.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), selectedImage: UIImage(systemName: "house.fill"))
+        
+        meditateVC.tabBarItem = UITabBarItem(title: "Meditate", image: UIImage(systemName: "apple.meditate"), selectedImage: UIImage(systemName: "apple.meditate"))
+        
+        aiVC.tabBarItem = UITabBarItem(title: "AI", image: UIImage(systemName: "sparkles"), selectedImage: UIImage(systemName: "sparkles.fill"))
+        
+        journalVC.tabBarItem = UITabBarItem(title: "Journal", image: UIImage(systemName: "book"), selectedImage: UIImage(systemName: "book.fill"))
+        
+        exploreVC.tabBarItem = UITabBarItem(title: "Explore", image: UIImage(systemName: "leaf"), selectedImage: UIImage(systemName: "leaf.fill"))
 
         viewControllers = [homeVC, meditateVC, aiVC, journalVC, exploreVC]
-        selectedIndex = 0
     }
 
     
     private func setupTabBarAppearance() {
-        tabBar.barTintColor = AppColors.background
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = AppColors.background
+
+        // убираем фон-индикатор под выбранной иконкой
+        appearance.selectionIndicatorTintColor = .clear
+        appearance.selectionIndicatorImage = UIImage()
+
+        // цвет иконок и текста
+        let normalAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: AppColors.lightText]
+        let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: AppColors.primary]
+
+        appearance.stackedLayoutAppearance.normal.iconColor = AppColors.lightText
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
+        appearance.stackedLayoutAppearance.selected.iconColor = AppColors.primary
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
+
+        tabBar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBar.scrollEdgeAppearance = appearance
+        }
         tabBar.tintColor = AppColors.primary
         tabBar.unselectedItemTintColor = AppColors.lightText
     }
 }
-
