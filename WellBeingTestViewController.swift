@@ -129,7 +129,7 @@ class WellBeingTestViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = AppColors.background
         title = "Психологическое благополучие"
-        
+
         progressView.progressTintColor = AppColors.primary
         progressView.trackTintColor = AppColors.accent.withAlphaComponent(0.3)
         progressView.translatesAutoresizingMaskIntoConstraints = false
@@ -203,7 +203,7 @@ class WellBeingTestViewController: UIViewController {
         Автономия: Независимость, способность противостоять социальному давлению, самостоятельность в решениях.
         Мастерство: Умение создавать подходящие условия жизни, эффективно использовать возможности.
         Цели в жизни: Наличие смысла жизни, целей и ощущение, что прошлое и настоящее осмысленны.
-        Личностный рост: Стремление к самосовершенствованию, ощущение развития и реализации своего потенциала. 
+        Личностный рост: Стремление к самосовершенствованию, ощущение развития и реализации своего потенциала.
         
         Инструкция:
         • Вам предстоит оценить 84 утверждения.

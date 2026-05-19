@@ -21,11 +21,17 @@ class ExploreViewController: UIViewController {
 
     // MARK: - Data
     private let articles: [(title: String, category: String, time: String, emoji: String)] = [
-        ("Управление стрессом",   "Психология",    "5 мин", "🧠"),
-        ("Сила благодарности",    "Саморазвитие",  "7 мин", "🌿"),
-        ("Осознанное дыхание",    "Практики",      "4 мин", "🌬️"),
-        ("Сон и восстановление",  "Здоровье",      "6 мин", "🌙"),
-        ("Медитация для начинающих", "Практики",   "8 мин", "🪷")
+        ("Управление стрессом",        "Психология",    "5 мин", "🧠"),
+        ("Сила благодарности",         "Саморазвитие",  "7 мин", "🌿"),
+        ("Осознанное дыхание",         "Практики",      "4 мин", "🌬️"),
+        ("Сон и восстановление",       "Здоровье",      "6 мин", "🌙"),
+        ("Медитация для начинающих",   "Практики",      "8 мин", "🪷"),
+        ("Позитивная психология",      "Психология",    "6 мин", "☀️"),
+        ("Совы и жаворонки",           "Здоровье",      "5 мин", "🦉"),
+        ("Эмоциональный интеллект",    "Саморазвитие",  "6 мин", "💛"),
+        ("Сила маленьких привычек",    "Саморазвитие",  "5 мин", "🌱"),
+        ("Тело и тревога",             "Психология",    "6 мин", "💙"),
+        ("Выгорание: как распознать",  "Здоровье",      "7 мин", "🔥"),
     ]
     
     private let podcasts: [(title: String, author: String, url: String, emoji: String)] = [
@@ -73,6 +79,16 @@ class ExploreViewController: UIViewController {
     }
 
     private func buildUI() {
+        let dateLabel = UILabel()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "EEEE, d MMMM"
+        let raw = formatter.string(from: Date())
+        dateLabel.text = raw.prefix(1).uppercased() + raw.dropFirst()
+        dateLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        dateLabel.textColor = textMid.withAlphaComponent(0.7)
+        dateLabel.textAlignment = .center
+
         let titleLabel = UILabel()
         titleLabel.text = "Интересное"
         titleLabel.font = .systemFont(ofSize: 30, weight: .bold)
@@ -84,6 +100,11 @@ class ExploreViewController: UIViewController {
         subtitleLabel.font = .systemFont(ofSize: 15, weight: .regular)
         subtitleLabel.textColor = textMid
         subtitleLabel.textAlignment = .center
+
+        let divider = UIView()
+        divider.backgroundColor = UIColor(red: 0.76, green: 0.68, blue: 0.58, alpha: 0.2)
+        divider.translatesAutoresizingMaskIntoConstraints = false
+        divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
 
         let articlesHeader = makeSectionHeader("Статьи")
         let articlesScroll = makeArticlesScroll()
@@ -98,7 +119,7 @@ class ExploreViewController: UIViewController {
         let testsSection = makeTestsSection()
 
         let mainStack = UIStackView(arrangedSubviews: [
-            titleLabel, subtitleLabel,
+            dateLabel, titleLabel, subtitleLabel, divider,
             articlesHeader, articlesScroll,
             podcastsHeader, podcastsScroll,
             wishHeader, wishCard,
@@ -107,8 +128,10 @@ class ExploreViewController: UIViewController {
         
         mainStack.axis = .vertical
         mainStack.spacing = 0
+        mainStack.setCustomSpacing(4,  after: dateLabel)
         mainStack.setCustomSpacing(4,  after: titleLabel)
-        mainStack.setCustomSpacing(28, after: subtitleLabel)
+        mainStack.setCustomSpacing(16, after: subtitleLabel)
+        mainStack.setCustomSpacing(28, after: divider)
         mainStack.setCustomSpacing(14, after: articlesHeader)
         mainStack.setCustomSpacing(28, after: articlesScroll)
         mainStack.setCustomSpacing(14, after: podcastsHeader)
@@ -139,7 +162,7 @@ class ExploreViewController: UIViewController {
     }
 
     // MARK: - New tests section with a "History" button
-    private func makeTestsSection() -> UIStackView {й
+    private func makeTestsSection() -> UIStackView {
         let headerStack = UIStackView()
         headerStack.axis = .horizontal
         headerStack.alignment = .center

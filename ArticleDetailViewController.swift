@@ -2,7 +2,7 @@
 //  ArticleDetailViewController.swift
 //  serevia
 //
-//  Created by ekatizzz on 12.04.2026.
+//  Created by ekatizzz on 14.04.2026.
 //
 
 import UIKit

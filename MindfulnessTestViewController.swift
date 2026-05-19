@@ -61,7 +61,7 @@ class MindfulnessTestViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = AppColors.background
         title = "Внимательность и осознанность"
-        
+
         progressView.progressTintColor = AppColors.primary
         progressView.trackTintColor = AppColors.accent.withAlphaComponent(0.3)
         progressView.translatesAutoresizingMaskIntoConstraints = false
@@ -130,7 +130,7 @@ class MindfulnessTestViewController: UIViewController {
         Тест внимательности и осознанности (MAAS) измеряет вашу способность находиться в настоящем моменте.
 
         Инструкция:
-        • Оцените, как часто вы сталкиваетесь с описанными ситуациями. 
+        • Оцените, как часто вы сталкиваетесь с описанными ситуациями.
         • Отвечайте искренне, основываясь на реальном опыте «автопилота» в жизни.
 
         Результаты теста носят ознакомительный характер и не являются диагнозом. При необходимости проконсультируйтесь со специалистом.
