@@ -202,7 +202,7 @@ class BeckTestViewController: UIViewController {
 
     private func showResults() {
         let (status, description) = interpretScore(totalScore)
-
+        
         TestHistoryViewController.saveResult(
             testName: "Уровень депрессии",
             score: Double(totalScore),

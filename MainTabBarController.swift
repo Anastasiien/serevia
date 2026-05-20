@@ -38,9 +38,28 @@ class MainTabBarController: UITabBarController {
 
     
     private func setupTabBarAppearance() {
-        tabBar.barTintColor = AppColors.background
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = AppColors.background
+
+        // убираем фон-индикатор под выбранной иконкой
+        appearance.selectionIndicatorTintColor = .clear
+        appearance.selectionIndicatorImage = UIImage()
+
+        // цвет иконок и текста
+        let normalAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: AppColors.lightText]
+        let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: AppColors.primary]
+
+        appearance.stackedLayoutAppearance.normal.iconColor = AppColors.lightText
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
+        appearance.stackedLayoutAppearance.selected.iconColor = AppColors.primary
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
+
+        tabBar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBar.scrollEdgeAppearance = appearance
+        }
         tabBar.tintColor = AppColors.primary
         tabBar.unselectedItemTintColor = AppColors.lightText
     }
 }
-
