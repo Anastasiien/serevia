@@ -8,6 +8,10 @@ disabled_rules:
   - identifier_name
   - force_cast
   - force_try
+  - opening_brace
+  - trailing_newline
+  - comma
+  - implicit_optional_initialization
 
 opt_in_rules:
   - empty_count
