@@ -1,0 +1,19 @@
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - file_length
+  - type_body_length
+  - function_body_length
+  - cyclomatic_complexity
+  - identifier_name
+  - force_cast
+  - force_try
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+
+excluded:
+  - sereviaTests
+
+reporter: "xcode"
