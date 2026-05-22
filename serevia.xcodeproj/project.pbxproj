@@ -1,0 +1,781 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		310700F72FAA932400C62C5C /* sleep_soft.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310700F62FAA932400C62C5C /* sleep_soft.mp3 */; };
+		310700F92FAA97A100C62C5C /* teplo_svet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310700F82FAA97A100C62C5C /* teplo_svet.mp3 */; };
+		310700FB2FAA97F400C62C5C /* nature_sleep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310700FA2FAA97F400C62C5C /* nature_sleep.mp3 */; };
+		310700FD2FAA984800C62C5C /* let_go_anxiety.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310700FC2FAA984800C62C5C /* let_go_anxiety.mp3 */; };
+		310701012FAA99D200C62C5C /* energy.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310701002FAA99D200C62C5C /* energy.mp3 */; };
+		310701052FAA9B0A00C62C5C /* calm_silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310701042FAA9B0A00C62C5C /* calm_silence.mp3 */; };
+		310701072FAA9C6C00C62C5C /* focus_power.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310701062FAA9C6B00C62C5C /* focus_power.mp3 */; };
+		310701092FAA9D3100C62C5C /* clear_mind.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 310701082FAA9D3100C62C5C /* clear_mind.mp3 */; };
+		3107010B2FAA9D9A00C62C5C /* breathing_calm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3107010A2FAA9D9A00C62C5C /* breathing_calm.mp3 */; };
+		3141304C2FC09CB500C64A20 /* DiaryStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3141304B2FC09CB500C64A20 /* DiaryStorageTests.swift */; };
+		3141304E2FC09EDF00C64A20 /* HabitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3141304D2FC09EDF00C64A20 /* HabitTests.swift */; };
+		314130502FC0A38900C64A20 /* MeditationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3141304F2FC0A38900C64A20 /* MeditationTests.swift */; };
+		314130522FC0A41B00C64A20 /* EdgeCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314130512FC0A41B00C64A20 /* EdgeCaseTests.swift */; };
+		314130542FC10B7600C64A20 /* Chatstoragetests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314130532FC10B7600C64A20 /* Chatstoragetests.swift */; };
+		314130562FC10BE800C64A20 /* Diaryentrycodabletests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314130552FC10BE800C64A20 /* Diaryentrycodabletests.swift */; };
+		314130582FC10C3300C64A20 /* Datetests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314130572FC10C3300C64A20 /* Datetests.swift */; };
+		3141305A2FC10E8200C64A20 /* AIClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314130592FC10E8100C64A20 /* AIClassifierTests.swift */; };
+		31FA11AD2F5F616F00DD179D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11AC2F5F616F00DD179D /* AppDelegate.swift */; };
+		31FA11AF2F5F616F00DD179D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11AE2F5F616F00DD179D /* SceneDelegate.swift */; };
+		31FA11B12F5F616F00DD179D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11B02F5F616F00DD179D /* ViewController.swift */; };
+		31FA11B42F5F616F00DD179D /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11B32F5F616F00DD179D /* Base */; };
+		31FA11B62F5F617100DD179D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11B52F5F617100DD179D /* Assets.xcassets */; };
+		31FA11B92F5F617100DD179D /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11B82F5F617100DD179D /* Base */; };
+		31FA11C12F5F619700DD179D /* AIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11C02F5F619700DD179D /* AIViewController.swift */; };
+		31FA11C32F5F621300DD179D /* ColorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11C22F5F621300DD179D /* ColorTheme.swift */; };
+		31FA11C52F5F624300DD179D /* DiaryDateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11C42F5F624300DD179D /* DiaryDateCell.swift */; };
+		31FA11C72F5F626900DD179D /* DiaryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11C62F5F626900DD179D /* DiaryDetailViewController.swift */; };
+		31FA11C92F5F628D00DD179D /* DiaryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11C82F5F628D00DD179D /* DiaryEntry.swift */; };
+		31FA11CB2F5F62BD00DD179D /* DiaryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11CA2F5F62BD00DD179D /* DiaryListViewController.swift */; };
+		31FA11CD2F5F62D900DD179D /* ExploreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11CC2F5F62D900DD179D /* ExploreViewController.swift */; };
+		31FA11CF2F5F62FA00DD179D /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11CE2F5F62FA00DD179D /* Extension.swift */; };
+		31FA11D12F5F637A00DD179D /* JournalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11D02F5F637A00DD179D /* JournalViewController.swift */; };
+		31FA11D32F5F63A500DD179D /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11D22F5F63A500DD179D /* MainTabBarController.swift */; };
+		31FA11D52F5F63C400DD179D /* MeditateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11D42F5F63C400DD179D /* MeditateViewController.swift */; };
+		31FA11D72F5F643D00DD179D /* WishMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11D62F5F643D00DD179D /* WishMapViewController.swift */; };
+		31FA11D92F5F65AA00DD179D /* africa.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11D82F5F65AA00DD179D /* africa.mp3 */; };
+		31FA11DB2F5F65B200DD179D /* airplane.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11DA2F5F65B200DD179D /* airplane.mp3 */; };
+		31FA11DD2F5F660D00DD179D /* birds.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11DC2F5F660D00DD179D /* birds.mp3 */; };
+		31FA11DF2F5F661400DD179D /* cat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11DE2F5F661400DD179D /* cat.mp3 */; };
+		31FA11E12F5F661800DD179D /* djaz.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E02F5F661800DD179D /* djaz.mp3 */; };
+		31FA11E32F5F662000DD179D /* lofi.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E22F5F662000DD179D /* lofi.mp3 */; };
+		31FA11E52F5F664900DD179D /* fireplace.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E42F5F664900DD179D /* fireplace.mp3 */; };
+		31FA11E72F5F667000DD179D /* japan.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E62F5F667000DD179D /* japan.mp3 */; };
+		31FA11EC2F5F667600DD179D /* rain.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E82F5F667600DD179D /* rain.mp3 */; };
+		31FA11ED2F5F667600DD179D /* stream.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11E92F5F667600DD179D /* stream.mp3 */; };
+		31FA11EE2F5F667600DD179D /* sea.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11EA2F5F667600DD179D /* sea.mp3 */; };
+		31FA11EF2F5F667600DD179D /* tibetan_bowls.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11EB2F5F667600DD179D /* tibetan_bowls.mp3 */; };
+		31FA11F32F5F667D00DD179D /* zen_bells.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11F02F5F667D00DD179D /* zen_bells.mp3 */; };
+		31FA11F42F5F667D00DD179D /* train.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11F12F5F667D00DD179D /* train.mp3 */; };
+		31FA11F52F5F667D00DD179D /* white_noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 31FA11F22F5F667D00DD179D /* white_noise.mp3 */; };
+		31FA11F72F5F678A00DD179D /* serevia1.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 31FA11F62F5F678A00DD179D /* serevia1.mlmodel */; };
+		632D97702F8D955F00533536 /* TestHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632D976F2F8D955D00533536 /* TestHistoryViewController.swift */; };
+		632D97762F8E2FA100533536 /* TestHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632D97752F8E2F9B00533536 /* TestHistory.swift */; };
+		632D97782F8E88BE00533536 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632D97772F8E88BC00533536 /* AuthViewController.swift */; };
+		632D977A2F8E890100533536 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632D97792F8E88FF00533536 /* ProfileViewController.swift */; };
+		632D977C2F8E96AB00533536 /* MoodChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632D977B2F8E96A900533536 /* MoodChartView.swift */; };
+		63EF77EA2F82B66A001B7349 /* ArticleDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63EF77E92F82B668001B7349 /* ArticleDetailViewController.swift */; };
+		63EF77EC2F82B6C4001B7349 /* ArticleProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63EF77EB2F82B6C3001B7349 /* ArticleProvider.swift */; };
+		63F289D62F82858500FF46D9 /* BeckTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F289D52F82857300FF46D9 /* BeckTestViewController.swift */; };
+		63F289D82F828B1400FF46D9 /* BeckAnxietyTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F289D72F828B1100FF46D9 /* BeckAnxietyTestViewController.swift */; };
+		63F289DA2F82970200FF46D9 /* MindfulnessTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F289D92F8296FF00FF46D9 /* MindfulnessTestViewController.swift */; };
+		63F289DC2F829CCC00FF46D9 /* WellBeingTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F289DB2F829CC900FF46D9 /* WellBeingTestViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		314130462FC097B600C64A20 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 31FA11A12F5F616F00DD179D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31FA11A82F5F616F00DD179D;
+			remoteInfo = serevia;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		310700F62FAA932400C62C5C /* sleep_soft.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sleep_soft.mp3; sourceTree = "<group>"; };
+		310700F82FAA97A100C62C5C /* teplo_svet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = teplo_svet.mp3; sourceTree = "<group>"; };
+		310700FA2FAA97F400C62C5C /* nature_sleep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = nature_sleep.mp3; sourceTree = "<group>"; };
+		310700FC2FAA984800C62C5C /* let_go_anxiety.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = let_go_anxiety.mp3; sourceTree = "<group>"; };
+		310701002FAA99D200C62C5C /* energy.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = energy.mp3; sourceTree = "<group>"; };
+		310701042FAA9B0A00C62C5C /* calm_silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = calm_silence.mp3; sourceTree = "<group>"; };
+		310701062FAA9C6B00C62C5C /* focus_power.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus_power.mp3; sourceTree = "<group>"; };
+		310701082FAA9D3100C62C5C /* clear_mind.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = clear_mind.mp3; sourceTree = "<group>"; };
+		3107010A2FAA9D9A00C62C5C /* breathing_calm.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = breathing_calm.mp3; sourceTree = "<group>"; };
+		314130422FC097B600C64A20 /* sereviaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sereviaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3141304B2FC09CB500C64A20 /* DiaryStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryStorageTests.swift; sourceTree = "<group>"; };
+		3141304D2FC09EDF00C64A20 /* HabitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitTests.swift; sourceTree = "<group>"; };
+		3141304F2FC0A38900C64A20 /* MeditationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditationTests.swift; sourceTree = "<group>"; };
+		314130512FC0A41B00C64A20 /* EdgeCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeCaseTests.swift; sourceTree = "<group>"; };
+		314130532FC10B7600C64A20 /* Chatstoragetests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chatstoragetests.swift; sourceTree = "<group>"; };
+		314130552FC10BE800C64A20 /* Diaryentrycodabletests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diaryentrycodabletests.swift; sourceTree = "<group>"; };
+		314130572FC10C3300C64A20 /* Datetests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Datetests.swift; sourceTree = "<group>"; };
+		314130592FC10E8100C64A20 /* AIClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIClassifierTests.swift; sourceTree = "<group>"; };
+		31FA11A92F5F616F00DD179D /* serevia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = serevia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		31FA11AC2F5F616F00DD179D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		31FA11AE2F5F616F00DD179D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		31FA11B02F5F616F00DD179D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		31FA11B32F5F616F00DD179D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		31FA11B52F5F617100DD179D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		31FA11B82F5F617100DD179D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		31FA11BA2F5F617100DD179D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		31FA11C02F5F619700DD179D /* AIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIViewController.swift; sourceTree = "<group>"; };
+		31FA11C22F5F621300DD179D /* ColorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTheme.swift; sourceTree = "<group>"; };
+		31FA11C42F5F624300DD179D /* DiaryDateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryDateCell.swift; sourceTree = "<group>"; };
+		31FA11C62F5F626900DD179D /* DiaryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryDetailViewController.swift; sourceTree = "<group>"; };
+		31FA11C82F5F628D00DD179D /* DiaryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryEntry.swift; sourceTree = "<group>"; };
+		31FA11CA2F5F62BD00DD179D /* DiaryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryListViewController.swift; sourceTree = "<group>"; };
+		31FA11CC2F5F62D900DD179D /* ExploreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewController.swift; sourceTree = "<group>"; };
+		31FA11CE2F5F62FA00DD179D /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		31FA11D02F5F637A00DD179D /* JournalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalViewController.swift; sourceTree = "<group>"; };
+		31FA11D22F5F63A500DD179D /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		31FA11D42F5F63C400DD179D /* MeditateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditateViewController.swift; sourceTree = "<group>"; };
+		31FA11D62F5F643D00DD179D /* WishMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WishMapViewController.swift; sourceTree = "<group>"; };
+		31FA11D82F5F65AA00DD179D /* africa.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = africa.mp3; sourceTree = "<group>"; };
+		31FA11DA2F5F65B200DD179D /* airplane.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = airplane.mp3; sourceTree = "<group>"; };
+		31FA11DC2F5F660D00DD179D /* birds.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = birds.mp3; sourceTree = "<group>"; };
+		31FA11DE2F5F661400DD179D /* cat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = cat.mp3; sourceTree = "<group>"; };
+		31FA11E02F5F661800DD179D /* djaz.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = djaz.mp3; sourceTree = "<group>"; };
+		31FA11E22F5F662000DD179D /* lofi.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = lofi.mp3; sourceTree = "<group>"; };
+		31FA11E42F5F664900DD179D /* fireplace.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fireplace.mp3; sourceTree = "<group>"; };
+		31FA11E62F5F667000DD179D /* japan.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = japan.mp3; sourceTree = "<group>"; };
+		31FA11E82F5F667600DD179D /* rain.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rain.mp3; sourceTree = "<group>"; };
+		31FA11E92F5F667600DD179D /* stream.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = stream.mp3; sourceTree = "<group>"; };
+		31FA11EA2F5F667600DD179D /* sea.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sea.mp3; sourceTree = "<group>"; };
+		31FA11EB2F5F667600DD179D /* tibetan_bowls.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = tibetan_bowls.mp3; sourceTree = "<group>"; };
+		31FA11F02F5F667D00DD179D /* zen_bells.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = zen_bells.mp3; sourceTree = "<group>"; };
+		31FA11F12F5F667D00DD179D /* train.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = train.mp3; sourceTree = "<group>"; };
+		31FA11F22F5F667D00DD179D /* white_noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = white_noise.mp3; sourceTree = "<group>"; };
+		31FA11F62F5F678A00DD179D /* serevia1.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = serevia1.mlmodel; sourceTree = "<group>"; };
+		632D976F2F8D955D00533536 /* TestHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHistoryViewController.swift; sourceTree = "<group>"; };
+		632D97752F8E2F9B00533536 /* TestHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHistory.swift; sourceTree = "<group>"; };
+		632D97772F8E88BC00533536 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		632D97792F8E88FF00533536 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		632D977B2F8E96A900533536 /* MoodChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodChartView.swift; sourceTree = "<group>"; };
+		63EF77E92F82B668001B7349 /* ArticleDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleDetailViewController.swift; sourceTree = "<group>"; };
+		63EF77EB2F82B6C3001B7349 /* ArticleProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleProvider.swift; sourceTree = "<group>"; };
+		63F289D52F82857300FF46D9 /* BeckTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeckTestViewController.swift; sourceTree = "<group>"; };
+		63F289D72F828B1100FF46D9 /* BeckAnxietyTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeckAnxietyTestViewController.swift; sourceTree = "<group>"; };
+		63F289D92F8296FF00FF46D9 /* MindfulnessTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindfulnessTestViewController.swift; sourceTree = "<group>"; };
+		63F289DB2F829CC900FF46D9 /* WellBeingTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WellBeingTestViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3141303F2FC097B600C64A20 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		31FA11A62F5F616F00DD179D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		314130312FC0920D00C64A20 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11AC2F5F616F00DD179D /* AppDelegate.swift */,
+				31FA11C22F5F621300DD179D /* ColorTheme.swift */,
+				31FA11D22F5F63A500DD179D /* MainTabBarController.swift */,
+				31FA11AE2F5F616F00DD179D /* SceneDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		314130322FC0925E00C64A20 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				632D97772F8E88BC00533536 /* AuthViewController.swift */,
+				632D97792F8E88FF00533536 /* ProfileViewController.swift */,
+				63EF77E92F82B668001B7349 /* ArticleDetailViewController.swift */,
+				63F289D52F82857300FF46D9 /* BeckTestViewController.swift */,
+				63F289D72F828B1100FF46D9 /* BeckAnxietyTestViewController.swift */,
+				63F289D92F8296FF00FF46D9 /* MindfulnessTestViewController.swift */,
+				63F289DB2F829CC900FF46D9 /* WellBeingTestViewController.swift */,
+				31FA11CC2F5F62D900DD179D /* ExploreViewController.swift */,
+				31FA11D62F5F643D00DD179D /* WishMapViewController.swift */,
+				632D976F2F8D955D00533536 /* TestHistoryViewController.swift */,
+				31FA11C62F5F626900DD179D /* DiaryDetailViewController.swift */,
+				31FA11CA2F5F62BD00DD179D /* DiaryListViewController.swift */,
+				31FA11D02F5F637A00DD179D /* JournalViewController.swift */,
+				31FA11D42F5F63C400DD179D /* MeditateViewController.swift */,
+				31FA11B02F5F616F00DD179D /* ViewController.swift */,
+				31FA11C02F5F619700DD179D /* AIViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		314130332FC092C900C64A20 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11C42F5F624300DD179D /* DiaryDateCell.swift */,
+				632D97752F8E2F9B00533536 /* TestHistory.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		314130342FC092DA00C64A20 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				632D977B2F8E96A900533536 /* MoodChartView.swift */,
+				31FA11C82F5F628D00DD179D /* DiaryEntry.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		314130352FC0930800C64A20 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				63EF77EB2F82B6C3001B7349 /* ArticleProvider.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		314130362FC0931B00C64A20 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11CE2F5F62FA00DD179D /* Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		314130372FC0933500C64A20 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				314130382FC0935600C64A20 /* Sounds */,
+				31FA11B52F5F617100DD179D /* Assets.xcassets */,
+				31FA11B72F5F617100DD179D /* LaunchScreen.storyboard */,
+				31FA11B22F5F616F00DD179D /* Main.storyboard */,
+				31FA11F62F5F678A00DD179D /* serevia1.mlmodel */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		314130382FC0935600C64A20 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11DA2F5F65B200DD179D /* airplane.mp3 */,
+				31FA11D82F5F65AA00DD179D /* africa.mp3 */,
+				31FA11DC2F5F660D00DD179D /* birds.mp3 */,
+				31FA11DE2F5F661400DD179D /* cat.mp3 */,
+				31FA11E02F5F661800DD179D /* djaz.mp3 */,
+				31FA11E22F5F662000DD179D /* lofi.mp3 */,
+				31FA11E42F5F664900DD179D /* fireplace.mp3 */,
+				31FA11E62F5F667000DD179D /* japan.mp3 */,
+				31FA11E82F5F667600DD179D /* rain.mp3 */,
+				31FA11EA2F5F667600DD179D /* sea.mp3 */,
+				31FA11E92F5F667600DD179D /* stream.mp3 */,
+				31FA11EB2F5F667600DD179D /* tibetan_bowls.mp3 */,
+				31FA11F12F5F667D00DD179D /* train.mp3 */,
+				31FA11F22F5F667D00DD179D /* white_noise.mp3 */,
+				31FA11F02F5F667D00DD179D /* zen_bells.mp3 */,
+				310700F62FAA932400C62C5C /* sleep_soft.mp3 */,
+				310700F82FAA97A100C62C5C /* teplo_svet.mp3 */,
+				310700FA2FAA97F400C62C5C /* nature_sleep.mp3 */,
+				310700FC2FAA984800C62C5C /* let_go_anxiety.mp3 */,
+				310701002FAA99D200C62C5C /* energy.mp3 */,
+				310701042FAA9B0A00C62C5C /* calm_silence.mp3 */,
+				310701062FAA9C6B00C62C5C /* focus_power.mp3 */,
+				310701082FAA9D3100C62C5C /* clear_mind.mp3 */,
+				3107010A2FAA9D9A00C62C5C /* breathing_calm.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
+		314130392FC0947500C64A20 /* Supporting files */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11BA2F5F617100DD179D /* Info.plist */,
+			);
+			name = "Supporting files";
+			sourceTree = "<group>";
+		};
+		314130432FC097B600C64A20 /* sereviaTests */ = {
+			isa = PBXGroup;
+			children = (
+				314130592FC10E8100C64A20 /* AIClassifierTests.swift */,
+				3141304B2FC09CB500C64A20 /* DiaryStorageTests.swift */,
+				3141304D2FC09EDF00C64A20 /* HabitTests.swift */,
+				3141304F2FC0A38900C64A20 /* MeditationTests.swift */,
+				314130512FC0A41B00C64A20 /* EdgeCaseTests.swift */,
+				314130532FC10B7600C64A20 /* Chatstoragetests.swift */,
+				314130552FC10BE800C64A20 /* Diaryentrycodabletests.swift */,
+				314130572FC10C3300C64A20 /* Datetests.swift */,
+			);
+			path = sereviaTests;
+			sourceTree = "<group>";
+		};
+		31FA11A02F5F616F00DD179D = {
+			isa = PBXGroup;
+			children = (
+				31FA11AB2F5F616F00DD179D /* serevia */,
+				314130432FC097B600C64A20 /* sereviaTests */,
+				31FA11AA2F5F616F00DD179D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		31FA11AA2F5F616F00DD179D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				31FA11A92F5F616F00DD179D /* serevia.app */,
+				314130422FC097B600C64A20 /* sereviaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		31FA11AB2F5F616F00DD179D /* serevia */ = {
+			isa = PBXGroup;
+			children = (
+				314130392FC0947500C64A20 /* Supporting files */,
+				314130372FC0933500C64A20 /* Resources */,
+				314130362FC0931B00C64A20 /* Extension */,
+				314130352FC0930800C64A20 /* Services */,
+				314130342FC092DA00C64A20 /* Views */,
+				314130332FC092C900C64A20 /* Models */,
+				314130322FC0925E00C64A20 /* Controllers */,
+				314130312FC0920D00C64A20 /* App */,
+			);
+			path = serevia;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		314130412FC097B600C64A20 /* sereviaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 314130482FC097B600C64A20 /* Build configuration list for PBXNativeTarget "sereviaTests" */;
+			buildPhases = (
+				3141303E2FC097B600C64A20 /* Sources */,
+				3141303F2FC097B600C64A20 /* Frameworks */,
+				314130402FC097B600C64A20 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				314130472FC097B600C64A20 /* PBXTargetDependency */,
+			);
+			name = sereviaTests;
+			productName = sereviaTests;
+			productReference = 314130422FC097B600C64A20 /* sereviaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		31FA11A82F5F616F00DD179D /* serevia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31FA11BD2F5F617100DD179D /* Build configuration list for PBXNativeTarget "serevia" */;
+			buildPhases = (
+				31FA11A52F5F616F00DD179D /* Sources */,
+				31FA11A62F5F616F00DD179D /* Frameworks */,
+				31FA11A72F5F616F00DD179D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = serevia;
+			productName = serevia;
+			productReference = 31FA11A92F5F616F00DD179D /* serevia.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		31FA11A12F5F616F00DD179D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					314130412FC097B600C64A20 = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 31FA11A82F5F616F00DD179D;
+					};
+					31FA11A82F5F616F00DD179D = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 31FA11A42F5F616F00DD179D /* Build configuration list for PBXProject "serevia" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 31FA11A02F5F616F00DD179D;
+			productRefGroup = 31FA11AA2F5F616F00DD179D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				31FA11A82F5F616F00DD179D /* serevia */,
+				314130412FC097B600C64A20 /* sereviaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		314130402FC097B600C64A20 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		31FA11A72F5F616F00DD179D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31FA11DB2F5F65B200DD179D /* airplane.mp3 in Resources */,
+				31FA11B62F5F617100DD179D /* Assets.xcassets in Resources */,
+				31FA11EE2F5F667600DD179D /* sea.mp3 in Resources */,
+				31FA11E52F5F664900DD179D /* fireplace.mp3 in Resources */,
+				31FA11E32F5F662000DD179D /* lofi.mp3 in Resources */,
+				3107010B2FAA9D9A00C62C5C /* breathing_calm.mp3 in Resources */,
+				31FA11B92F5F617100DD179D /* Base in Resources */,
+				31FA11E72F5F667000DD179D /* japan.mp3 in Resources */,
+				31FA11F42F5F667D00DD179D /* train.mp3 in Resources */,
+				31FA11ED2F5F667600DD179D /* stream.mp3 in Resources */,
+				31FA11D92F5F65AA00DD179D /* africa.mp3 in Resources */,
+				31FA11F32F5F667D00DD179D /* zen_bells.mp3 in Resources */,
+				31FA11DF2F5F661400DD179D /* cat.mp3 in Resources */,
+				31FA11EC2F5F667600DD179D /* rain.mp3 in Resources */,
+				310700F92FAA97A100C62C5C /* teplo_svet.mp3 in Resources */,
+				31FA11EF2F5F667600DD179D /* tibetan_bowls.mp3 in Resources */,
+				31FA11B42F5F616F00DD179D /* Base in Resources */,
+				310700F72FAA932400C62C5C /* sleep_soft.mp3 in Resources */,
+				310701072FAA9C6C00C62C5C /* focus_power.mp3 in Resources */,
+				310701012FAA99D200C62C5C /* energy.mp3 in Resources */,
+				310700FD2FAA984800C62C5C /* let_go_anxiety.mp3 in Resources */,
+				310701052FAA9B0A00C62C5C /* calm_silence.mp3 in Resources */,
+				310700FB2FAA97F400C62C5C /* nature_sleep.mp3 in Resources */,
+				310701092FAA9D3100C62C5C /* clear_mind.mp3 in Resources */,
+				31FA11F52F5F667D00DD179D /* white_noise.mp3 in Resources */,
+				31FA11DD2F5F660D00DD179D /* birds.mp3 in Resources */,
+				31FA11E12F5F661800DD179D /* djaz.mp3 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3141303E2FC097B600C64A20 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				314130542FC10B7600C64A20 /* Chatstoragetests.swift in Sources */,
+				314130502FC0A38900C64A20 /* MeditationTests.swift in Sources */,
+				314130582FC10C3300C64A20 /* Datetests.swift in Sources */,
+				314130562FC10BE800C64A20 /* Diaryentrycodabletests.swift in Sources */,
+				314130522FC0A41B00C64A20 /* EdgeCaseTests.swift in Sources */,
+				3141305A2FC10E8200C64A20 /* AIClassifierTests.swift in Sources */,
+				3141304C2FC09CB500C64A20 /* DiaryStorageTests.swift in Sources */,
+				3141304E2FC09EDF00C64A20 /* HabitTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		31FA11A52F5F616F00DD179D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63F289DC2F829CCC00FF46D9 /* WellBeingTestViewController.swift in Sources */,
+				31FA11B12F5F616F00DD179D /* ViewController.swift in Sources */,
+				31FA11C32F5F621300DD179D /* ColorTheme.swift in Sources */,
+				31FA11CD2F5F62D900DD179D /* ExploreViewController.swift in Sources */,
+				31FA11AD2F5F616F00DD179D /* AppDelegate.swift in Sources */,
+				31FA11D12F5F637A00DD179D /* JournalViewController.swift in Sources */,
+				31FA11D52F5F63C400DD179D /* MeditateViewController.swift in Sources */,
+				31FA11CF2F5F62FA00DD179D /* Extension.swift in Sources */,
+				63F289DA2F82970200FF46D9 /* MindfulnessTestViewController.swift in Sources */,
+				31FA11D72F5F643D00DD179D /* WishMapViewController.swift in Sources */,
+				632D977A2F8E890100533536 /* ProfileViewController.swift in Sources */,
+				63F289D82F828B1400FF46D9 /* BeckAnxietyTestViewController.swift in Sources */,
+				31FA11F72F5F678A00DD179D /* serevia1.mlmodel in Sources */,
+				31FA11C72F5F626900DD179D /* DiaryDetailViewController.swift in Sources */,
+				31FA11D32F5F63A500DD179D /* MainTabBarController.swift in Sources */,
+				63F289D62F82858500FF46D9 /* BeckTestViewController.swift in Sources */,
+				31FA11C12F5F619700DD179D /* AIViewController.swift in Sources */,
+				31FA11AF2F5F616F00DD179D /* SceneDelegate.swift in Sources */,
+				632D97782F8E88BE00533536 /* AuthViewController.swift in Sources */,
+				63EF77EC2F82B6C4001B7349 /* ArticleProvider.swift in Sources */,
+				632D97702F8D955F00533536 /* TestHistoryViewController.swift in Sources */,
+				632D977C2F8E96AB00533536 /* MoodChartView.swift in Sources */,
+				63EF77EA2F82B66A001B7349 /* ArticleDetailViewController.swift in Sources */,
+				31FA11C92F5F628D00DD179D /* DiaryEntry.swift in Sources */,
+				31FA11CB2F5F62BD00DD179D /* DiaryListViewController.swift in Sources */,
+				632D97762F8E2FA100533536 /* TestHistory.swift in Sources */,
+				31FA11C52F5F624300DD179D /* DiaryDateCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		314130472FC097B600C64A20 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31FA11A82F5F616F00DD179D /* serevia */;
+			targetProxy = 314130462FC097B600C64A20 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		31FA11B22F5F616F00DD179D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				31FA11B32F5F616F00DD179D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		31FA11B72F5F617100DD179D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				31FA11B82F5F617100DD179D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		314130492FC097B600C64A20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2M946L2C46;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Anastasia.sereviaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/serevia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/serevia";
+			};
+			name = Debug;
+		};
+		3141304A2FC097B600C64A20 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2M946L2C46;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Anastasia.sereviaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/serevia.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/serevia";
+			};
+			name = Release;
+		};
+		31FA11BB2F5F617100DD179D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		31FA11BC2F5F617100DD179D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		31FA11BE2F5F617100DD179D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33TZKQSMGL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = serevia/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Anastasia.serevia;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		31FA11BF2F5F617100DD179D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33TZKQSMGL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = serevia/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Anastasia.serevia;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		314130482FC097B600C64A20 /* Build configuration list for PBXNativeTarget "sereviaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				314130492FC097B600C64A20 /* Debug */,
+				3141304A2FC097B600C64A20 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		31FA11A42F5F616F00DD179D /* Build configuration list for PBXProject "serevia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31FA11BB2F5F617100DD179D /* Debug */,
+				31FA11BC2F5F617100DD179D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		31FA11BD2F5F617100DD179D /* Build configuration list for PBXNativeTarget "serevia" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31FA11BE2F5F617100DD179D /* Debug */,
+				31FA11BF2F5F617100DD179D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 31FA11A12F5F616F00DD179D /* Project object */;
+}
