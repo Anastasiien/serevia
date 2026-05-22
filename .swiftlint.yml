@@ -12,10 +12,14 @@ disabled_rules:
   - trailing_newline
   - comma
   - implicit_optional_initialization
-
-opt_in_rules:
+  - large_tuple
   - empty_count
-  - empty_string
+  - vertical_whitespace
+  - colon
+  - statement_position
+  - for_where
+  - trailing_comma
+  - vertical_parameter_alignment
 
 excluded:
   - sereviaTests
