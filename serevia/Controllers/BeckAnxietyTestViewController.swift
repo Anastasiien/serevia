@@ -153,7 +153,7 @@ class BeckAnxietyTestViewController: UIViewController {
         startButton.isHidden = false
     }
 
-    @objc private func startTest() {
+    @objc func startTest() {
         UIView.animate(withDuration: 0.3) {
             self.descriptionLabel.isHidden = true
             self.startButton.isHidden = true
@@ -210,7 +210,7 @@ class BeckAnxietyTestViewController: UIViewController {
         progressView.setProgress(progress, animated: true)
     }
 
-    @objc private func optionSelected(_ sender: UIButton) {
+    @objc func optionSelected(_ sender: UIButton) {
         totalScore += sender.tag
         
         if currentQuestionIndex < questions.count - 1 {

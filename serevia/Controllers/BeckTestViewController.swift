@@ -187,7 +187,7 @@ class BeckTestViewController: UIViewController {
         progressView.setProgress(progress, animated: true)
     }
 
-    @objc private func optionSelected(_ sender: UIButton) {
+    @objc func optionSelected(_ sender: UIButton) {
         totalScore += sender.tag
         
         if currentQuestionIndex < questions.count - 1 {
@@ -211,13 +211,28 @@ class BeckTestViewController: UIViewController {
         
         let alert = UIAlertController(
             title: "Результат: \(totalScore) баллов",
-            message: "\(status)\n\n\(description)\n\nПомните: результаты носят ознакомительный характер. Если вы чувствуете потребность, обратитесь к специалисту.",
+            message: """
+            \(status)
+
+            \(description)
+            
+            Помните: результаты носят ознакомительный характер. Если вы чувствуете потребность, обратитесь к специалисту.
+            """,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "Завершить", style: .default) { _ in
-            self.navigationController?.popViewController(animated: true)
-        })
-        present(alert, animated: true)
+
+        let finishAction = UIAlertAction(
+            title: "Завершить",
+            style: .default
+        ) { [weak self] _ in
+            self?.navigationController?.popViewController(animated: true)
+        }
+
+        alert.addAction(finishAction)
+
+        DispatchQueue.main.async { [weak self] in
+            self?.present(alert, animated: false)
+        }
     }
 
     private func interpretScore(_ score: Int) -> (String, String) {

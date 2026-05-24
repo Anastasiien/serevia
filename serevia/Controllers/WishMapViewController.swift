@@ -1,5 +1,5 @@
 //
-//  ExploreViewController.swift
+//  WishMapViewController.swift
 //  serevia
 //
 //  Created by ekatizzz 11.03.2026.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class WishMapEditorViewController: UIViewController,
+ class WishMapEditorViewController: UIViewController,
                                         UIImagePickerControllerDelegate,
                                         UINavigationControllerDelegate,
                                         UIGestureRecognizerDelegate,
@@ -193,6 +193,7 @@ final class WishMapEditorViewController: UIViewController,
         config.background.cornerRadius = 14
         
         saveButton.configuration = config
+        saveButton.setTitle("Сохранить", for: .normal)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.addTarget(self, action: #selector(saveToHome), for: .touchUpInside)
 
@@ -521,7 +522,7 @@ final class WishMapEditorViewController: UIViewController,
         textView.becomeFirstResponder()
     }
     
-    @objc private func addImage() {
+    @objc func addImage() {
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = false
