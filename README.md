@@ -39,24 +39,11 @@ Serevia — это мобильное iOS-приложение, предназн
 
 ## Среда разработки
 
-- Xcode 15+
-- Swift 5
-- iOS 15.0+
-- UIKit
-- macOS Ventura / Sonoma
-
-## Используемые технологии
-
-- UIKit
-- Auto Layout
-- UICollectionView
-- UIScrollView
-- AVFoundation
-- CoreML
-- UserDefaults
-- Codable
-- NotificationCenter
-- UIImagePickerController
+> Xcode 15+  
+> Swift 5  
+> iOS 15.0+  
+> UIKit  
+> macOS Ventura / Sonoma  
 
 [🔝 Оглавление](#оглавление)
 
@@ -311,8 +298,9 @@ git checkout -b feature/your-feature
 3. Внесите изменения.
 4. Проведите тестирование.
 5. Создайте Pull Request.
-
+   
 [🔝 Оглавление](#оглавление)
+
 ---
 
 # Авторы проекта
