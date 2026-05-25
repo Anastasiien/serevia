@@ -183,7 +183,6 @@ Serevia — это мобильное iOS-приложение, предназн
 
 - AuthViewController
 - ProfileViewController
-- EditProfileViewController
 
 Функциональность:
 
@@ -217,6 +216,7 @@ Serevia — это мобильное iOS-приложение, предназн
 - BeckAnxietyTestViewController
 - MindfulnessTestViewController
 - WellBeingTestViewController
+- TestHistoryViewController
 
 Функциональность:
 
@@ -253,6 +253,59 @@ Serevia — это мобильное iOS-приложение, предназн
 - drag-and-drop;
 - сохранение состояния холста;
 - текстовые заметки.
+
+---
+
+### Модуль главного экрана и трекер привычек
+
+Основные контроллер:
+
+- HomeViewController
+
+Функциональность:
+
+- отображение мотивационных цитат;
+- система ежедневных отметок;
+- счётчик стриков;
+- отображение превью карты желаний.
+
+---
+
+### Модуль медитаций
+
+Основной контроллер:
+
+- MeditationViewController
+
+Основные компоненты:
+
+- MeditationPlayerView
+- MeditationTimerManager
+- MeditationLibraryProvider
+
+Функциональность:
+
+- каталог медитаций;
+- библиотека фоновых мелодий;
+- управление воспроизведением;
+- переключение между практиками.
+
+---
+
+### Модуль дневника настроения
+
+Основные контроллеры:
+
+- DiaryDetailViewController
+- DiaryListViewController
+- JournalViewController
+
+Функциональность:
+
+- создание и удаление записей настроения;
+- просмотр истории записей;
+- отслеживание эмоциональной динамики;
+- локальное хранение записей.
 
 [🔝 Оглавление](#оглавление)
 
@@ -335,8 +388,6 @@ git checkout -b feature/your-feature
 
 # Лицензия
 
-Проект Serevia распространяется исключительно в образовательных целях в рамках курсовой работы НИУ ВШЭ.
-
-Все материалы проекта принадлежат авторам разработки.
+Serevia  распространяется по лицензии PolyForm Noncommercial от имён Afanasyeva Ekaterina и Berdyugina Anastasia.
 
 [🔝 Оглавление](#оглавление)
