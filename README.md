@@ -388,6 +388,6 @@ git checkout -b feature/your-feature
 
 # Лицензия
 
-Serevia  распространяется по лицензии PolyForm Noncommercial от имён Afanasyeva Ekaterina и Berdyugina Anastasia.
+Serevia  распространяется по лицензии [PolyForm Noncommercial](LICENSE) от имён Afanasyeva Ekaterina и Berdyugina Anastasia.
 
 [🔝 Оглавление](#оглавление)
